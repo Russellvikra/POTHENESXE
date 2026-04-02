@@ -1,0 +1,155 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(180deg, #f7f9fb 0%, #eef3f8 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.page-wrap {
+    width: min(1150px, 100% - 24px);
+    margin: 28px auto 48px;
+    display: grid;
+    gap: 18px;
+}
+
+.hero-card,
+.card {
+    background: #fff;
+    border: 1px solid #dbe3ee;
+    border-radius: 16px;
+    padding: 22px;
+    box-shadow: 0 8px 30px rgba(28, 48, 77, 0.06);
+}
+
+.hero-card h1,
+.card h2 {
+    margin-top: 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.stats-grid article {
+    border: 1px solid #dce8f7;
+    background: #f8fbff;
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.label {
+    margin: 0;
+    color: #647089;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.value {
+    margin: 8px 0 0;
+    color: #111;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: 2fr 1fr auto auto;
+    gap: 10px;
+}
+
+input,
+select,
+button {
+    border: 1px solid #cfe0f6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+}
+
+button {
+    background: #0c3f91;
+    color: #fff;
+    border-color: #0c3f91;
+    cursor: pointer;
+}
+
+.clear-link {
+    align-self: center;
+    color: #0c3f91;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.list-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.list-head p {
+    color: #647089;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 850px;
+}
+
+th,
+td {
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e5edf7;
+}
+
+thead th {
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-size: 12px;
+    color: #4d5d78;
+}
+
+.status {
+    display: inline-flex;
+    padding: 4px 10px;
+    border-radius: 999px;
+    text-transform: capitalize;
+    font-size: 12px;
+}
+
+.status-draft {
+    background: #fff5df;
+    color: #b86a00;
+}
+
+.status-submitted {
+    background: #e8f8ee;
+    color: #1d7f41;
+}
+
+.empty {
+    margin: 0;
+    color: #647089;
+}
+
+@media (max-width: 700px) {
+    .filters {
+        grid-template-columns: 1fr;
+    }
+}

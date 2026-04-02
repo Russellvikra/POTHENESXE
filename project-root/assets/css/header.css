@@ -1,0 +1,113 @@
+.header-container {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    padding: 12px 24px;
+    background-color: #fff;
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 44px;
+    position: relative;
+}
+
+.navbar-brand {
+    font-size: 15px;
+    font-weight: 600;
+    color: #111;
+    text-decoration: none;
+    letter-spacing: -0.3px;
+}
+
+.navbar-menu {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.navbar-menu li a {
+    font-size: 14px;
+    color: #555;
+    text-decoration: none;
+    padding: 6px 12px;
+    border-radius: 8px;
+    transition: background 0.15s, color 0.15s;
+}
+
+.navbar-menu li a:hover {
+    background: #f5f5f5;
+    color: #111;
+}
+
+.navbar-menu li a.active {
+    background: #f0f0f0;
+    color: #111;
+    font-weight: 500;
+}
+
+.navbar-divider {
+    width: 1px;
+    height: 20px;
+    background: #e5e5e5;
+    margin: 0 8px;
+}
+
+.btn-register {
+    background: #111 !important;
+    color: #fff !important;
+    font-weight: 500 !important;
+    padding: 7px 16px !important;
+    border-radius: 8px;
+}
+
+.btn-register:hover {
+    background: #333 !important;
+}
+
+.navbar-burger {
+    display: none;
+    flex-direction: column;
+    gap: 5px;
+    background: none;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.navbar-burger span {
+    display: block;
+    width: 18px;
+    height: 1.5px;
+    background: #111;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+    .navbar-burger { display: flex; }
+
+    .navbar-menu {
+        display: none;
+        flex-direction: column;
+        align-items: stretch;
+        position: absolute;
+        top: 52px;
+        left: 0; right: 0;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        border-radius: 12px;
+        padding: 12px;
+        gap: 4px;
+    }
+
+    .navbar-menu.open { display: flex; }
+    .navbar-menu li a { display: block; }
+    .navbar-divider { width: 100%; height: 1px; margin: 4px 0; }
+}

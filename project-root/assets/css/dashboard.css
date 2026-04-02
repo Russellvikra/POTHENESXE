@@ -1,0 +1,89 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(180deg, #f7f9fb 0%, #eef3f8 100%);
+  min-height: 100vh;
+  margin: 0;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 30px 20px;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid #dbe3ee;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 8px 30px rgba(28, 48, 77, 0.06);
+  margin-bottom: 20px;
+}
+
+h1 {
+  margin: 0 0 8px;
+  font-size: 32px;
+}
+
+.meta {
+  color: #647089;
+  margin-bottom: 24px;
+}
+
+.user-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.info-box {
+  background: #f8fbff;
+  border: 1px solid #d9e7fa;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.info-label {
+  color: #5d6f8f;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.info-value {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+}
+
+a {
+  display: inline-block;
+  padding: 10px 20px;
+  background: #0c3f91;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  transition: background 0.15s;
+  margin-right: 10px;
+}
+
+a:hover {
+  background: #0a2f6f;
+}
+
+a[style*="background: #c82c3b"] {
+  background: #c82c3b !important;
+  margin-left: 10px;
+}
+
+a[style*="background: #c82c3b"]:hover {
+  background: #a01f2d !important;
+}
