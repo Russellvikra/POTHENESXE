@@ -1,12 +1,14 @@
 <?php
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 require_once __DIR__ . '/../includes/db.php';
+$activeNav = 'declaration';
 
 $declarationId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1]
 ]);
 
 $declaration = null;
-$assets = [];
 $recentDeclarations = [];
 $errorMessage = '';
 
@@ -14,11 +16,9 @@ if ($declarationId) {
     $statement = $pdo->prepare(
         'SELECT d.id, d.year, d.status, d.created_at,
                 p.position,
-                u.username,
                 pa.name AS party_name
          FROM declarations d
          INNER JOIN politicians p ON p.id = d.politician_id
-         INNER JOIN users u ON u.id = p.user_id
          LEFT JOIN parties pa ON pa.id = p.party_id
          WHERE d.id = :declaration_id'
     );
@@ -26,25 +26,15 @@ if ($declarationId) {
     $statement->execute(['declaration_id' => $declarationId]);
     $declaration = $statement->fetch();
 
-    if ($declaration) {
-        $assetsStatement = $pdo->prepare(
-            'SELECT type, description, value
-             FROM assets
-             WHERE declaration_id = :declaration_id
-             ORDER BY id ASC'
-        );
-
-        $assetsStatement->execute(['declaration_id' => $declarationId]);
-        $assets = $assetsStatement->fetchAll();
-    } else {
+    if (!$declaration) {
         $errorMessage = 'Declaration was not found.';
     }
 } else {
     $recentStatement = $pdo->query(
-        'SELECT d.id, d.year, d.status, u.username
+        'SELECT d.id, d.year, d.status, p.position, pa.name AS party_name
          FROM declarations d
          INNER JOIN politicians p ON p.id = d.politician_id
-         INNER JOIN users u ON u.id = p.user_id
+         LEFT JOIN parties pa ON pa.id = p.party_id
          ORDER BY d.created_at DESC, d.id DESC
          LIMIT 10'
     );
@@ -68,26 +58,7 @@ function esc(string $value): string
     <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
-    <header>
-        <div class="header-container">
-            <nav class="navbar">
-                <a href="../index.php" class="navbar-brand">Πόθεν Έσχες</a>
-                <button class="navbar-burger" id="burger" onclick="toggleMenu()" aria-label="Toggle menu">
-                    <span></span><span></span><span></span>
-                </button>
-                <ul class="navbar-menu" id="nav-links">
-                    <li><a href="search_dashboard.php">Search Module</a></li>
-                    <li><a href="../submit/dashboard.php">Submit Module</a></li>
-                    <li><a href="../api/index.php">API</a></li>
-                    <li><a href="list.php">Search</a></li>
-                    <li><a href="declaration.php" class="active">Declaration</a></li>
-                    <li class="navbar-divider"></li>
-                    <li><a href="../admin/admin.php">Admin Module</a></li>
-                    <li><a href="../auth/register.php">Register</a></li>
-                </ul>
-            </nav>
-        </div>
-    </header>
+    <?php include '../assets/include/header.html'; ?>
 
     <main class="page-wrap">
         <section class="page-head">
@@ -109,10 +80,6 @@ function esc(string $value): string
                     <p class="meta-value">#<?= (int) $declaration['id'] ?></p>
                 </div>
                 <div>
-                    <p class="meta-label">Official</p>
-                    <p class="meta-value"><?= esc($declaration['username']) ?></p>
-                </div>
-                <div>
                     <p class="meta-label">Party</p>
                     <p class="meta-value"><?= esc($declaration['party_name'] ?? 'N/A') ?></p>
                 </div>
@@ -132,46 +99,10 @@ function esc(string $value): string
 
             <section class="card">
                 <div class="card-title-row">
-                    <h2>Assets</h2>
+                    <h2>Declaration Details</h2>
                     <p class="muted">Created: <?= esc((string) $declaration['created_at']) ?></p>
                 </div>
-
-                <?php if (count($assets) === 0): ?>
-                    <p class="muted">No assets are registered for this declaration.</p>
-                <?php else: ?>
-                    <?php
-                    $totalValue = 0.0;
-                    foreach ($assets as $assetRow) {
-                        $totalValue += (float) $assetRow['value'];
-                    }
-                    ?>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Description</th>
-                                    <th>Value (EUR)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($assets as $asset): ?>
-                                    <tr>
-                                        <td><?= esc((string) $asset['type']) ?></td>
-                                        <td><?= esc((string) $asset['description']) ?></td>
-                                        <td><?= number_format((float) $asset['value'], 2) ?></td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td colspan="2">Total</td>
-                                    <td><?= number_format($totalValue, 2) ?></td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                <?php endif; ?>
+                <p class="muted">Detailed asset records are restricted to authenticated users.</p>
             </section>
         <?php else: ?>
             <section class="card">
@@ -186,7 +117,7 @@ function esc(string $value): string
                             <li>
                                 <div>
                                     <strong>#<?= (int) $recent['id'] ?></strong>
-                                    <span><?= esc((string) $recent['username']) ?> - <?= esc((string) $recent['year']) ?></span>
+                                    <span><?= esc((string) ($recent['party_name'] ?? 'N/A')) ?> - <?= esc((string) ($recent['position'] ?? 'N/A')) ?> - <?= esc((string) $recent['year']) ?></span>
                                 </div>
                                 <a href="declaration.php?id=<?= (int) $recent['id'] ?>" class="btn-link">Open</a>
                             </li>

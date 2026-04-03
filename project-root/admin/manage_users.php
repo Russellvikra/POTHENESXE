@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -39,11 +40,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'update') {
             $id = (int) ($_POST['id'] ?? 0);
             $username = trim($_POST['username'] ?? '');
+            $email = trim($_POST['email'] ?? '');
             $role = $_POST['role'] ?? 'user';
-            if ($id > 0 && $username !== '') {
+            if ($id > 0 && $username !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $role = in_array($role, ['admin', 'politician', 'user'], true) ? $role : 'user';
-                $stmt = $pdo->prepare('UPDATE users SET username = :u, role = :r WHERE id = :id');
-                $stmt->execute(['u' => $username, 'r' => $role, 'id' => $id]);
+                $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r WHERE id = :id');
+                $stmt->execute([
+                    'u' => $username,
+                    'e' => $email,
+                    'r' => $role,
+                    'id' => $id,
+                ]);
                 $message = 'User updated.';
             }
         }
@@ -76,9 +83,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 <body>
 <main class="page-wrap">
     <section class="card">
-        <p><a href="admin.php" class="clear-link">Admin Dashboard</a> | <a href="manage_users.php" class="clear-link">Manage Users</a> | <a href="manage_submissions.php" class="clear-link">Manage Submissions</a> | <a href="configure.php" class="clear-link">Configure System</a> | <a href="reports.php" class="clear-link">Reports</a></p>
         <h1>Manage Users</h1>
-        <p><a href="admin.php" class="clear-link">Back to Admin Dashboard</a></p>
         <?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
 
         <h2>Add User</h2>
@@ -113,6 +118,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                                 <input type="hidden" name="action" value="update">
                                 <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
                                 <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" required>
+                                <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" required>
                                 <select name="role">
                                     <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
                                     <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>
@@ -133,5 +139,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
         </div>
     </section>
 </main>
+<script src="../assets/js/header.js"></script>
 </body>
 </html>

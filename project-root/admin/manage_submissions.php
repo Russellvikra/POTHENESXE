@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 
 if (!isset($_SESSION['user_id'])) {
@@ -45,8 +46,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Submissions</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body>
 <main class="page-wrap">
-<section class="card"><p><a href="admin.php" class="clear-link">Admin Dashboard</a> | <a href="manage_users.php" class="clear-link">Manage Users</a> | <a href="manage_submissions.php" class="clear-link">Manage Submissions</a> | <a href="configure.php" class="clear-link">Configure System</a> | <a href="reports.php" class="clear-link">Reports</a></p></section>
-<section class="card"><h1>Manage Submissions</h1><p><a href="admin.php" class="clear-link">Back to Admin Dashboard</a></p><?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
+<section class="card"><h1>Manage Submissions</h1><?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
 <form method="GET" class="filter-form">
 <select name="status"><option value="">All status</option><option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option></select>
 <select name="order"><option value="newest" <?= $order === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $order === 'oldest' ? 'selected' : '' ?>>Oldest</option></select>
@@ -57,4 +57,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 <td><?= esc((string)$row['username']) ?></td><td><?= esc((string)$row['year']) ?></td><td><?= esc((string)$row['status']) ?></td><td>EUR <?= number_format((float)$row['total'],2) ?></td><td><?= esc((string)$row['created_at']) ?></td>
 <td><form method="POST" class="inline-form"><input type="hidden" name="id" value="<?= (int)$row['id'] ?>"><select name="status"><option value="draft" <?= $row['status'] === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $row['status'] === 'submitted' ? 'selected' : '' ?>>Submitted</option></select><button type="submit">Save</button></form></td>
 </tr><?php endforeach; ?>
-</tbody></table></div></section></main></body></html>
+</tbody></table></div></section></main>
+<script src="../assets/js/header.js"></script>
+</body></html>

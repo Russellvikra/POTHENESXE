@@ -1,12 +1,9 @@
 CREATE TABLE users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(100) NOT NULL,
-    first_name VARCHAR(100) DEFAULT NULL,
-    last_name VARCHAR(100) DEFAULT NULL,
-    phone VARCHAR(30) DEFAULT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
-    role ENUM('admin','politician','user') DEFAULT 'user',
+    role ENUM('admin', 'politician', 'user') DEFAULT 'user',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -17,27 +14,31 @@ CREATE TABLE parties (
 
 CREATE TABLE politicians (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
-    party_id INT,
-    position VARCHAR(100),
+    user_id INT NOT NULL,
+    party_id INT DEFAULT NULL,
+    position VARCHAR(100) DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (party_id) REFERENCES parties(id) ON DELETE SET NULL
 );
 
 CREATE TABLE declarations (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    politician_id INT,
-    year YEAR,
-    status ENUM('draft','submitted') DEFAULT 'draft',
+    user_id INT DEFAULT NULL,
+    politician_id INT DEFAULT NULL,
+    title VARCHAR(150) DEFAULT NULL,
+    details TEXT DEFAULT NULL,
+    year YEAR NOT NULL,
+    status ENUM('draft', 'submitted') DEFAULT 'draft',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     FOREIGN KEY (politician_id) REFERENCES politicians(id) ON DELETE CASCADE
 );
 
 CREATE TABLE assets (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    declaration_id INT,
-    type VARCHAR(50), -- π.χ. deposit, car, house
-    description TEXT,
-    value DECIMAL(12,2),
+    declaration_id INT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    description TEXT NOT NULL,
+    value DECIMAL(12,2) NOT NULL,
     FOREIGN KEY (declaration_id) REFERENCES declarations(id) ON DELETE CASCADE
 );

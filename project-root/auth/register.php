@@ -5,9 +5,6 @@ $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
-    $firstName = trim($_POST['first_name'] ?? '');
-    $lastName = trim($_POST['last_name'] ?? '');
-    $phone = trim($_POST['phone'] ?? '');
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
@@ -15,18 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Server-side validation
     if (empty($username)) {
         $errors[] = 'Username is required.';
-    }
-
-    if (empty($firstName)) {
-        $errors[] = 'First name is required.';
-    }
-
-    if (empty($lastName)) {
-        $errors[] = 'Last name is required.';
-    }
-
-    if ($phone !== '' && !preg_match('/^[0-9+\-\s]{6,30}$/', $phone)) {
-        $errors[] = 'Phone format is invalid.';
     }
 
     if (empty($email)) {
@@ -57,14 +42,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Insert user
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 $insertStmt = $pdo->prepare(
-                    'INSERT INTO users (username, first_name, last_name, phone, email, password_hash, role) 
-                     VALUES (:username, :first_name, :last_name, :phone, :email, :password_hash, :role)'
+                    'INSERT INTO users (username, email, password_hash, role) 
+                     VALUES (:username, :email, :password_hash, :role)'
                 );
                 $insertStmt->execute([
                     'username' => $username,
-                    'first_name' => $firstName,
-                    'last_name' => $lastName,
-                    'phone' => ($phone !== '' ? $phone : null),
                     'email' => $email,
                     'password_hash' => $passwordHash,
                     'role' => 'user'
@@ -105,21 +87,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" value="<?= htmlspecialchars($_POST['username'] ?? '') ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="first_name">First Name</label>
-                <input type="text" id="first_name" name="first_name" value="<?= htmlspecialchars($_POST['first_name'] ?? '') ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="last_name">Last Name</label>
-                <input type="text" id="last_name" name="last_name" value="<?= htmlspecialchars($_POST['last_name'] ?? '') ?>" required>
-            </div>
-
-            <div class="form-group">
-                <label for="phone">Phone</label>
-                <input type="text" id="phone" name="phone" value="<?= htmlspecialchars($_POST['phone'] ?? '') ?>" placeholder="e.g. 99000000">
             </div>
 
             <div class="form-group">

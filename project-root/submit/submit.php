@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 
 require_once __DIR__ . '/../includes/db.php';
 
@@ -14,6 +15,7 @@ if (!in_array($_SESSION['role'] ?? '', ['politician', 'admin'], true)) {
 }
 
 $errors = [];
+$activeNav = 'submit';
 $successId = filter_input(INPUT_GET, 'success_id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1],
 ]);
@@ -89,9 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $insertDeclarationStmt = $pdo->prepare(
-                'INSERT INTO declarations (politician_id, year, status) VALUES (:politician_id, :year, :status)'
+                'INSERT INTO declarations (user_id, politician_id, year, status) VALUES (:user_id, :politician_id, :year, :status)'
             );
             $insertDeclarationStmt->execute([
+                'user_id' => (int) $_SESSION['user_id'],
                 'politician_id' => $politicianId,
                 'year' => (int) $year,
                 'status' => $status,
@@ -141,32 +144,9 @@ function esc(string $value): string
     <link rel="stylesheet" href="../assets/css/submit.css">
 </head>
 <body>
-<header>
-    <div class="header-container">
-        <nav class="navbar">
-            <a href="../index.php" class="navbar-brand">Pothen Esxes</a>
-            <button class="navbar-burger" id="burger" onclick="toggleMenu()" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
-            <ul class="navbar-menu" id="nav-links">
-                <li><a href="../modules/search_dashboard.php">Search Module</a></li>
-                <li><a href="dashboard.php" class="active">Submit Module</a></li>
-                <li><a href="../api/index.php">API</a></li>
-                <li><a href="../modules/list.php">Search</a></li>
-                <li><a href="dashboard.php">Dashboard</a></li>
-                <li><a href="../auth/logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
-
+<?php include '../assets/include/header.html'; ?>
 <main class="page-wrap">
     <section class="card">
-        <p>
-            <a href="dashboard.php" class="clear-link">Submit Dashboard</a> |
-            <a href="profile.php" class="clear-link">My Profile</a> |
-            <a href="my_submissions.php" class="clear-link">My Submissions</a>
-        </p>
         <h1>Submit Declaration</h1>
         <p>Create a new declaration and include one or more asset records.</p>
 
@@ -249,8 +229,8 @@ function esc(string $value): string
                 <h4>Pages</h4>
                 <ul>
                     <li><a href="../index.php">Home</a></li>
-                    <li><a href="../modules/search_dashboard.php">Search Module</a></li>
-                    <li><a href="../modules/list.php">Search</a></li>
+                    <li><a href="../modules/list.php">Search Module</a></li>
+                    <li><a href="../submit/dashboard.php">Submit Module</a></li>
                 </ul>
             </div>
             <div class="footer-section">
@@ -258,13 +238,6 @@ function esc(string $value): string
                 <ul>
                     <li><a href="dashboard.php">Dashboard</a></li>
                     <li><a href="../auth/logout.php">Logout</a></li>
-                </ul>
-            </div>
-            <div class="footer-section">
-                <h4>Admin</h4>
-                <ul>
-                    <li><a href="../admin/admin.php">Admin Console</a></li>
-                    <li><a href="../modules/declaration.php">Declaration</a></li>
                 </ul>
             </div>
         </div>
