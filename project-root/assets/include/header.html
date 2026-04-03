@@ -20,12 +20,22 @@ if ($relativeDir === '' || $relativeDir === '.') {
 $basePath = $depth > 0 ? str_repeat('../', $depth) : './';
 $isLoggedIn = isset($_SESSION['user_id']);
 
+$role = $_SESSION['role'] ?? 'user';
+
 $navItems = [
   ['key' => 'home', 'label' => 'Home', 'href' => $basePath . 'index.php'],
+  ['key' => 'search', 'label' => 'Search', 'href' => $basePath . 'modules/list.php'],
+  ['key' => 'declarations', 'label' => 'Declarations', 'href' => $basePath . 'modules/declaration.php'],
 ];
 
 if ($isLoggedIn) {
-    $navItems[] = ['key' => 'logout', 'label' => 'Logout', 'href' => $basePath . 'auth/logout.php'];
+    if ($role === 'politician') {
+        $navItems[] = ['key' => 'submit', 'label' => 'Submit', 'href' => $basePath . 'submit/dashboard.php'];
+    }
+    if ($role === 'admin') {
+        $navItems[] = ['key' => 'admin', 'label' => 'Admin', 'href' => $basePath . 'admin/admin.php'];
+    }
+    $navItems[] = ['key' => 'logout', 'label' => 'Logout', 'href' => $basePath . 'auth/logout.php', 'class' => 'btn-logout'];
 } else {
     $navItems[] = ['key' => 'login', 'label' => 'Login', 'href' => $basePath . 'auth/login.php'];
     $navItems[] = ['key' => 'register', 'label' => 'Register', 'href' => $basePath . 'auth/register.php', 'class' => 'btn-register'];

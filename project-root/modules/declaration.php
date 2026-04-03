@@ -134,41 +134,7 @@ function esc(string $value): string
         <?php endif; ?>
     </main>
 
-    <footer>
-        <div class="footer-container">
-            <div class="footer-grid">
-                <div class="footer-brand">
-                    <a href="../index.php" class="footer-logo">Πόθεν Έσχες</a>
-                    <p>Παρακολούθηση και αναζήτηση των δηλώσεων πόθεν έσχες των Αξιωματούχων της Κυπριακής Δημοκρατίας.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Pages</h4>
-                    <ul>
-                        <li><a href="../index.php">Home</a></li>
-                        <li><a href="list.php">Search</a></li>
-                        <li><a href="declaration.php">Declaration</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Account</h4>
-                    <ul>
-                        <li><a href="../auth/logout.php">Logout</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>External</h4>
-                    <ul>
-                        <li><a href="https://www.parliament.cy/el/ποθεν-εσχες" target="_blank" rel="noopener">Parliament</a></li>
-                        <li><a href="https://github.com/Russellvikra/CSE-326" target="_blank" rel="noopener">Repository</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2026 Πόθεν Έσχες.</p>
-            </div>
-        </div>
-    </footer>
-
+    <?php include '../assets/include/footer.html'; ?>
     <script src="../assets/js/header.js"></script>
 </body>
 </html>

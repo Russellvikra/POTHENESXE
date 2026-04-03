@@ -1,13 +1,15 @@
 footer {
   margin-top: auto;
-  border-top: 1px solid #e5e5e5;
-  background: #fff;
+  border-top: 1px solid #e7ecf5;
+  background: #f6f8fc;
+  color: #475d7f;
+  font-size: 14px;
 }
 
 .footer-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 48px 24px 24px;
+  padding: 40px 24px 24px;
 }
 
 .footer-grid {
