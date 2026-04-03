@@ -38,8 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$parties = $pdo->query('SELECT id, name FROM parties ORDER BY name ASC')->fetchAll();
-$politicians = $pdo->query('SELECT p.id, p.position, p.party_id, u.username FROM politicians p INNER JOIN users u ON u.id = p.user_id ORDER BY u.username ASC')->fetchAll();
+// Backfill politician profiles for role=politician users that were created before sync logic existed.
+$backfillStmt = $pdo->prepare(
+    'INSERT INTO politicians (user_id)
+     SELECT u.id
+     FROM users u
+     LEFT JOIN politicians p ON p.user_id = u.id
+     WHERE u.role = "politician" AND p.id IS NULL'
+);
+$backfillStmt->execute();
+
+$partiesStmt = $pdo->prepare('SELECT id, name FROM parties ORDER BY name ASC');
+$partiesStmt->execute();
+$parties = $partiesStmt->fetchAll();
+
+$politiciansStmt = $pdo->prepare('SELECT p.id, p.position, p.party_id, u.username FROM politicians p INNER JOIN users u ON u.id = p.user_id ORDER BY u.username ASC');
+$politiciansStmt->execute();
+$politicians = $politiciansStmt->fetchAll();
 
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
 ?>

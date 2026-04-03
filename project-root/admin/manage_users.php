@@ -33,6 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'p' => password_hash($password, PASSWORD_DEFAULT),
                     'r' => $role,
                 ]);
+
+                if ($role === 'politician') {
+                    $userId = (int) $pdo->lastInsertId();
+                    $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) VALUES (:user_id)');
+                    $linkStmt->execute(['user_id' => $userId]);
+                }
+
                 $message = 'User added.';
             }
         }
@@ -45,6 +52,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $newPassword = $_POST['new_password'] ?? '';
             if ($id > 0 && $username !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $role = in_array($role, ['admin', 'politician', 'user'], true) ? $role : 'user';
+
+                $existingRoleStmt = $pdo->prepare('SELECT role FROM users WHERE id = :id');
+                $existingRoleStmt->execute(['id' => $id]);
+                $existingRole = (string) ($existingRoleStmt->fetchColumn() ?: '');
+
                 if ($newPassword !== '') {
                     if (strlen($newPassword) < 8) {
                         $message = 'Password must be at least 8 characters.';
@@ -57,6 +69,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             'p' => password_hash($newPassword, PASSWORD_DEFAULT),
                             'id' => $id,
                         ]);
+
+                        if ($role === 'politician' && $existingRole !== 'politician') {
+                            $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) SELECT :user_id WHERE NOT EXISTS (SELECT 1 FROM politicians WHERE user_id = :user_id)');
+                            $linkStmt->execute(['user_id' => $id]);
+                        }
+
                         $message = 'User updated.';
                     }
                 } else {
@@ -67,6 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         'r' => $role,
                         'id' => $id,
                     ]);
+
+                    if ($role === 'politician' && $existingRole !== 'politician') {
+                        $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) SELECT :user_id WHERE NOT EXISTS (SELECT 1 FROM politicians WHERE user_id = :user_id)');
+                        $linkStmt->execute(['user_id' => $id]);
+                    }
+
                     $message = 'User updated.';
                 }
             }
@@ -85,7 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$users = $pdo->query('SELECT id, username, email, role, created_at FROM users ORDER BY id DESC')->fetchAll();
+$usersStmt = $pdo->prepare('SELECT id, username, email, role, created_at FROM users ORDER BY id DESC');
+$usersStmt->execute();
+$users = $usersStmt->fetchAll();
 
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
 ?>

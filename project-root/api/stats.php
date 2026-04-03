@@ -10,6 +10,13 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
     exit;
 }
 
+if (!isset($_SESSION['user_id'])) {
+    http_response_code(401);
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
 if (($_SESSION['role'] ?? '') !== 'admin') {
     http_response_code(403);
     header('Content-Type: application/json; charset=UTF-8');
@@ -20,10 +27,21 @@ if (($_SESSION['role'] ?? '') !== 'admin') {
 require_once __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json; charset=UTF-8');
 
-$summary = $pdo->query('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id')->fetch();
-$byYear = $pdo->query('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC')->fetchAll();
-$byParty = $pdo->query('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC')->fetchAll();
-$assetTypes = $pdo->query('SELECT type, COUNT(*) AS count, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC')->fetchAll();
+$summaryStmt = $pdo->prepare('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id');
+$summaryStmt->execute();
+$summary = $summaryStmt->fetch();
+
+$byYearStmt = $pdo->prepare('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC');
+$byYearStmt->execute();
+$byYear = $byYearStmt->fetchAll();
+
+$byPartyStmt = $pdo->prepare('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC');
+$byPartyStmt->execute();
+$byParty = $byPartyStmt->fetchAll();
+
+$assetTypesStmt = $pdo->prepare('SELECT type, COUNT(*) AS count, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC');
+$assetTypesStmt->execute();
+$assetTypes = $assetTypesStmt->fetchAll();
 
 echo json_encode([
     'summary' => $summary,

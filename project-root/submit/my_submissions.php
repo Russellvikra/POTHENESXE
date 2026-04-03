@@ -7,28 +7,34 @@ if (!isset($_SESSION['user_id'])) { header('Location: ../auth/login.php', true, 
 if (($_SESSION['role'] ?? '') !== 'politician') { http_response_code(403); exit('403 Forbidden'); }
 
 $userId = (int) $_SESSION['user_id'];
-$order = ($_GET['order'] ?? 'newest') === 'oldest' ? 'ASC' : 'DESC';
+$orderInput = ($_GET['order'] ?? 'newest') === 'oldest' ? 'oldest' : 'newest';
 $status = trim($_GET['status'] ?? '');
 $status = in_array($status, ['draft', 'submitted'], true) ? $status : '';
-
-$where = 'WHERE p.user_id = :uid';
-$params = ['uid' => $userId];
-if ($status !== '') {
-    $where .= ' AND d.status = :status';
-    $params['status'] = $status;
-}
 
 $stmt = $pdo->prepare(
     'SELECT d.id, d.year, d.status, d.created_at, COALESCE(SUM(a.value),0) AS total
      FROM declarations d
      INNER JOIN politicians p ON p.id = d.politician_id
      LEFT JOIN assets a ON a.declaration_id = d.id
-     ' . $where . '
+         WHERE p.user_id = :uid
+             AND (:has_status = 0 OR d.status = :status)
      GROUP BY d.id, d.year, d.status, d.created_at
-     ORDER BY d.created_at ' . $order . ', d.id ' . $order
+         ORDER BY
+             CASE WHEN :order_mode = "oldest" THEN d.created_at END ASC,
+             CASE WHEN :order_mode = "newest" THEN d.created_at END DESC,
+             CASE WHEN :order_mode = "oldest" THEN d.id END ASC,
+             CASE WHEN :order_mode = "newest" THEN d.id END DESC
+    '
 );
-$stmt->execute($params);
+$stmt->execute([
+        'uid' => $userId,
+        'has_status' => $status === '' ? 0 : 1,
+        'status' => $status === '' ? 'draft' : $status,
+        'order_mode' => $orderInput,
+]);
 $rows = $stmt->fetchAll();
+
+$order = $orderInput === 'oldest' ? 'ASC' : 'DESC';
 
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
 ?>

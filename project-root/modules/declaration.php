@@ -4,6 +4,11 @@ app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 $activeNav = 'declaration';
 
+if (!isset($_SESSION['user_id'])) {
+    header('Location: ../auth/login.php', true, 302);
+    exit;
+}
+
 $declarationId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1]
 ]);
@@ -30,7 +35,7 @@ if ($declarationId) {
         $errorMessage = 'Declaration was not found.';
     }
 } else {
-    $recentStatement = $pdo->query(
+    $recentStatement = $pdo->prepare(
         'SELECT d.id, d.year, d.status, p.position, pa.name AS party_name
          FROM declarations d
          INNER JOIN politicians p ON p.id = d.politician_id
@@ -38,6 +43,7 @@ if ($declarationId) {
          ORDER BY d.created_at DESC, d.id DESC
          LIMIT 10'
     );
+    $recentStatement->execute();
 
     $recentDeclarations = $recentStatement->fetchAll();
 }
@@ -146,7 +152,7 @@ function esc(string $value): string
                 <div class="footer-section">
                     <h4>Account</h4>
                     <ul>
-                        <li><a href="../auth/register.php">Register</a></li>
+                        <li><a href="../auth/logout.php">Logout</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">

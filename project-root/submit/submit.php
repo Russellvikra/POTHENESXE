@@ -152,8 +152,8 @@ function esc(string $value): string
 
         <?php if ($successId): ?>
             <div class="success">
-                Declaration #<?= $successId ?> was saved successfully.
-                <a href="../modules/declaration.php?id=<?= $successId ?>">Open declaration</a>
+                Declaration #<?= (int) $successId ?> was saved successfully.
+                <a href="../modules/declaration.php?id=<?= (int) $successId ?>">Open declaration</a>
             </div>
         <?php endif; ?>
 

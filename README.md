@@ -3,8 +3,8 @@
 ## Team Members
 
 - Konstandinos Avramidis - AM: 27779
-- Russell Vickramasingam - AM: 27688
-- Alexandros Pelekanos - AM: 30713
+- Russell Vickramasingam - AM: 30713
+- Alexandros Pelekanos - AM: 27688
 
 ## Project Description
 
@@ -12,11 +12,11 @@ This project is a web-based Pothen Esxes Monitoring System for managing and moni
 
 The system supports:
 
-- Public pages and declaration browsing
-- User authentication and protected user dashboards
+- Mandatory authentication before accessing application modules
+- Role-based protected dashboards and modules
 - Submission and profile management flows
 - Administrative management tools
-- API endpoints for declarations and statistics
+- API endpoints with access control
 
 ## Technologies Used
 
@@ -32,23 +32,19 @@ All module files are shared by all members.
 Database files (`schema.sql`, `seed.sql`, `db.php`) are assigned to Konstandinos Avramidis.
 
 - Konstandinos Avramidis
-  - Pages (PHP): `project-root/auth/login.php`, `project-root/auth/logout.php`, `project-root/auth/register.php`, `project-root/submit/dashboard.php`, `project-root/submit/my_submissions.php`, `project-root/submit/profile.php`, `project-root/submit/submit.php`
-  - Page markup: `project-root/submit/submit.html`
-  - Page CSS/JS support (shared where needed): `project-root/assets/css/auth.css`, `project-root/assets/css/submit.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
-  - Database: `project-root/database/schema.sql`, `project-root/database/seed.sql`, `project-root/includes/db.php`
-  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/stats.php`
+  - Authentication flow (login/register/logout) and session handling
+  - Submit flow (dashboard, profile, my submissions, submit declaration)
+  - Database schema/seed setup and DB connection integration
 
 - Russell Vickramasingam
-  - Pages (PHP): `project-root/index.php`, `project-root/public/public.php`
-  - Page markup: `project-root/public/public.html`
-  - Page CSS/JS: `project-root/assets/css/home.css`, `project-root/assets/css/public.css`, `project-root/assets/css/header.css`, `project-root/assets/css/footer.css`, `project-root/assets/css/list.css`, `project-root/assets/css/declaration.css`, `project-root/assets/css/dashboard.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
-  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/stats.php`
+  - Main authenticated app entry and navigation structure
+  - Declaration discovery flow (search/list/declaration views)
+  - Shared UI integration (header/footer and page styling)
 
 - Alexandros Pelekanos
-  - Pages (PHP): `project-root/admin/admin.php`, `project-root/admin/configure.php`, `project-root/admin/manage_submissions.php`, `project-root/admin/manage_users.php`, `project-root/admin/reports.php`, `project-root/api/index.php`, `project-root/api/declarations.php`, `project-root/api/stats.php`
-  - Page markup: `project-root/admin/admin.html`
-  - Page CSS/JS support: `project-root/assets/css/admin.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
-  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/search_dashboard.php`, `project-root/modules/stats.php`
+  - Admin flow (users, submissions, configuration, reports)
+  - API flow (index/declarations/stats) with access control
+  - Admin reporting and statistics features
 
 ## Project Structure
 
@@ -101,9 +97,6 @@ project-root/
     list.php
     search_dashboard.php
     stats.php
-  public/
-    public.html
-    public.php
   submit/
     dashboard.php
     my_submissions.php
@@ -139,19 +132,27 @@ README.md
 - Output escaping (for example `htmlspecialchars()`) where needed
 - Session-based authentication and access control
 
+## Secure Coding Rules (Mandatory)
+
+- Always use prepared statements (`$pdo->prepare(...)` + `execute(...)`) and never SQL string concatenation.
+- Always use `password_hash()` for stored passwords and never plain-text passwords.
+- Always use `htmlspecialchars()` when echoing user-controlled data.
+- Always call `exit;` immediately after every `header('Location: ...')` redirect.
+- Never use `die($e->getMessage())` because it can expose sensitive backend/database details.
+
 ## Features Implemented
 
 - User registration, login, and logout
+- Login-required access control across modules
 - User dashboard and personal submission management
 - Declaration listing and detailed declaration pages
 - Search and statistics modules
-- Public-facing pages
 - Admin pages for configuration, users, submissions, and reports
-- API endpoints for declarations and statistics
+- API endpoints for declarations and statistics (authenticated access)
 
 ## Repository
 
-GitHub: https://github.com/Russellvikra/CSE-326.git
+GitHub: https://github.com/Russellvikra/POTHENESXE
 
 ## Moodle Deliverable Checklist
 
