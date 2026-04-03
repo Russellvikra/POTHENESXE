@@ -39,6 +39,7 @@ if ($searchPerformed) {
     <title>Search Declarations</title>
     <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/list.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
     <?php include '../assets/include/header.html'; ?>
@@ -61,8 +62,9 @@ if ($searchPerformed) {
                         <p>No declarations found for <strong><?= htmlspecialchars($keyword) ?></strong></p>
                     </div>
                 <?php else: ?>
-                    <table>
-                        <thead>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>User</th>
@@ -83,6 +85,7 @@ if ($searchPerformed) {
                             <?php endforeach; ?>
                         </tbody>
                     </table>
+                    </div>
                     <p class="meta" style="margin-top: 16px;">
                         Found <?= count($declarations) ?> declaration<?= count($declarations) !== 1 ? 's' : '' ?>.
                     </p>
@@ -94,6 +97,7 @@ if ($searchPerformed) {
             <?php endif; ?>
         </div>
     </div>
+    <?php include '../assets/include/footer.html'; ?>
     <script src="../assets/js/header.js"></script>
 </body>
 </html>
