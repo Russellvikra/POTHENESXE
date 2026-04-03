@@ -42,16 +42,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = trim($_POST['username'] ?? '');
             $email = trim($_POST['email'] ?? '');
             $role = $_POST['role'] ?? 'user';
+            $newPassword = $_POST['new_password'] ?? '';
             if ($id > 0 && $username !== '' && filter_var($email, FILTER_VALIDATE_EMAIL)) {
                 $role = in_array($role, ['admin', 'politician', 'user'], true) ? $role : 'user';
-                $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r WHERE id = :id');
-                $stmt->execute([
-                    'u' => $username,
-                    'e' => $email,
-                    'r' => $role,
-                    'id' => $id,
-                ]);
-                $message = 'User updated.';
+                if ($newPassword !== '') {
+                    if (strlen($newPassword) < 8) {
+                        $message = 'Password must be at least 8 characters.';
+                    } else {
+                        $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r, password_hash = :p WHERE id = :id');
+                        $stmt->execute([
+                            'u' => $username,
+                            'e' => $email,
+                            'r' => $role,
+                            'p' => password_hash($newPassword, PASSWORD_DEFAULT),
+                            'id' => $id,
+                        ]);
+                        $message = 'User updated.';
+                    }
+                } else {
+                    $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r WHERE id = :id');
+                    $stmt->execute([
+                        'u' => $username,
+                        'e' => $email,
+                        'r' => $role,
+                        'id' => $id,
+                    ]);
+                    $message = 'User updated.';
+                }
             }
         }
 
@@ -119,6 +136,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                                 <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
                                 <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" required>
                                 <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" required>
+                                <input type="password" name="new_password" placeholder="New password (optional)">
                                 <select name="role">
                                     <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
                                     <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>

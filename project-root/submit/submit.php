@@ -9,7 +9,7 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
-if (!in_array($_SESSION['role'] ?? '', ['politician', 'admin'], true)) {
+if (($_SESSION['role'] ?? '') !== 'politician') {
     http_response_code(403);
     exit('403 Forbidden');
 }

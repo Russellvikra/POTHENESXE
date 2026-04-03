@@ -38,7 +38,7 @@ $role = $_SESSION['role'] ?? 'user';
                 <p><a href="modules/list.php">Open Search Module</a></p>
             </div>
 
-            <?php if (in_array($role, ['politician', 'admin'], true)): ?>
+            <?php if ($role === 'politician'): ?>
                 <div class="feature-card">
                     <h3>Submit Module</h3>
                     <p>Manage your profile and submissions.</p>
