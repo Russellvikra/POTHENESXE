@@ -26,20 +26,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $status = trim($_GET['status'] ?? '');
 $status = in_array($status, ['draft', 'submitted'], true) ? $status : '';
 $order = trim($_GET['order'] ?? 'newest');
-$orderSql = $order === 'oldest' ? 'ASC' : 'DESC';
+$orderMode = $order === 'oldest' ? 'oldest' : 'newest';
 
-$where = $status !== '' ? 'WHERE d.status = :status' : '';
 $stmt = $pdo->prepare(
     'SELECT d.id, d.year, d.status, d.created_at, u.username, COALESCE(SUM(a.value),0) AS total
      FROM declarations d
      INNER JOIN politicians p ON p.id = d.politician_id
      INNER JOIN users u ON u.id = p.user_id
      LEFT JOIN assets a ON a.declaration_id = d.id
-     ' . $where . '
+     WHERE (:has_status = 0 OR d.status = :status)
      GROUP BY d.id, d.year, d.status, d.created_at, u.username
-     ORDER BY d.created_at ' . $orderSql . ', d.id ' . $orderSql
+     ORDER BY
+       CASE WHEN :order_mode = "oldest" THEN d.created_at END ASC,
+       CASE WHEN :order_mode = "newest" THEN d.created_at END DESC,
+       CASE WHEN :order_mode = "oldest" THEN d.id END ASC,
+       CASE WHEN :order_mode = "newest" THEN d.id END DESC
+        '
 );
-$stmt->execute($status !== '' ? ['status' => $status] : []);
+$stmt->execute([
+    'has_status' => $status === '' ? 0 : 1,
+    'status' => $status === '' ? 'draft' : $status,
+    'order_mode' => $orderMode,
+]);
 $rows = $stmt->fetchAll();
 
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }

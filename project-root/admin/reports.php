@@ -6,11 +6,23 @@ require_once __DIR__ . '/../includes/db.php';
 if (!isset($_SESSION['user_id'])) { header('Location: ../auth/login.php', true, 302); exit; }
 if (($_SESSION['role'] ?? '') !== 'admin') { http_response_code(403); exit('403 Forbidden'); }
 
-$summary = $pdo->query('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id')->fetch();
-$byYear = $pdo->query('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC')->fetchAll();
-$byParty = $pdo->query('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC')->fetchAll();
-$assetTypes = $pdo->query('SELECT type, COUNT(*) AS cnt, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC')->fetchAll();
-$missingSubmissions = $pdo->query(
+$summaryStmt = $pdo->prepare('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id');
+$summaryStmt->execute();
+$summary = $summaryStmt->fetch();
+
+$byYearStmt = $pdo->prepare('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC');
+$byYearStmt->execute();
+$byYear = $byYearStmt->fetchAll();
+
+$byPartyStmt = $pdo->prepare('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC');
+$byPartyStmt->execute();
+$byParty = $byPartyStmt->fetchAll();
+
+$assetTypesStmt = $pdo->prepare('SELECT type, COUNT(*) AS cnt, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC');
+$assetTypesStmt->execute();
+$assetTypes = $assetTypesStmt->fetchAll();
+
+$missingSubmissionsStmt = $pdo->prepare(
 	'SELECT u.username, u.email, p.position, COALESCE(pa.name, "N/A") AS party
 	 FROM politicians p
 	 INNER JOIN users u ON u.id = p.user_id
@@ -18,7 +30,9 @@ $missingSubmissions = $pdo->query(
 	 LEFT JOIN declarations d ON d.politician_id = p.id
 	 WHERE d.id IS NULL
 	 ORDER BY u.username ASC'
-)->fetchAll();
+);
+$missingSubmissionsStmt->execute();
+$missingSubmissions = $missingSubmissionsStmt->fetchAll();
 
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
 ?>

@@ -1,10 +1,20 @@
 <?php
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
+
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
 	http_response_code(204);
+	exit;
+}
+
+if (!isset($_SESSION['user_id'])) {
+	http_response_code(401);
+	header('Content-Type: application/json; charset=UTF-8');
+	echo json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
 	exit;
 }
 
