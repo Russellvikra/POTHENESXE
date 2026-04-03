@@ -1,7 +1,9 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 
 require_once __DIR__ . '/../includes/db.php';
+$activeNav = 'admin';
 
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
@@ -30,24 +32,7 @@ function esc(string $value): string
     <link rel="stylesheet" href="../assets/css/admin.css">
 </head>
 <body>
-<header>
-    <div class="header-container">
-        <nav class="navbar">
-            <a href="../index.php" class="navbar-brand">Pothen Esxes</a>
-            <button class="navbar-burger" id="burger" onclick="toggleMenu()" aria-label="Toggle menu">
-                <span></span><span></span><span></span>
-            </button>
-            <ul class="navbar-menu" id="nav-links">
-                <li><a href="../modules/search_dashboard.php">Search Module</a></li>
-                <li><a href="../submit/dashboard.php">Submit Module</a></li>
-                <li><a href="../api/index.php">API</a></li>
-                <li><a href="../modules/list.php">Search</a></li>
-                <li><a href="admin.php" class="active">Admin Module</a></li>
-                <li><a href="../auth/logout.php">Logout</a></li>
-            </ul>
-        </nav>
-    </div>
-</header>
+<?php include '../assets/include/header.html'; ?>
 
 <main class="page-wrap">
     <section class="card">
@@ -90,7 +75,7 @@ function esc(string $value): string
                 <h4>Pages</h4>
                 <ul>
                     <li><a href="../index.php">Home</a></li>
-                    <li><a href="../modules/search_dashboard.php">Search Module</a></li>
+                    <li><a href="../modules/list.php">Search Module</a></li>
                     <li><a href="../submit/dashboard.php">Submit Module</a></li>
                 </ul>
             </div>

@@ -1,185 +1,161 @@
-# Web Engineering Project – Pothen Esxes Monitoring System
+# Web Engineering Project - Pothen Esxes Monitoring System
 
-## 👥 Team Members
+## Team Members
 
-* Konstandinos Avramidis — AM: [ΣΥΜΠΛΗΡΩΣΤΕ]
-* Russell Vickramasingam — AM: [ΣΥΜΠΛΗΡΩΣΤΕ]
-* Alexandros Pelekanos — AM: [ΣΥΜΠΛΗΡΩΣΤΕ]
+- Konstandinos Avramidis - AM: 27779
+- Russell Vickramasingam - AM: 27688
+- Alexandros Pelekanos - AM: 30713
 
-## 🧑‍💻 Work Distribution (M2)
+## Project Description
 
-* Konstandinos Avramidis: `project-root/database/schema.sql`, `project-root/includes/db.php`
-* Russell Vickramasingam: `project-root/auth/register.php`, `project-root/auth/login.php`, `project-root/auth/logout.php`
-* Alexandros Pelekanos: `project-root/modules/dashboard.php`, `project-root/modules/list.php`, `project-root/database/seed.sql`
+This project is a web-based Pothen Esxes Monitoring System for managing and monitoring financial declarations of public officials in Cyprus.
 
----
+The system supports:
 
-## 📌 Project Description
+- Public pages and declaration browsing
+- User authentication and protected user dashboards
+- Submission and profile management flows
+- Administrative management tools
+- API endpoints for declarations and statistics
 
-This project is a web-based **Pothen Esxes Monitoring System** developed for tracking and managing the financial declarations of public officials in Cyprus.
+## Technologies Used
 
-The system allows users to access, search, and analyze declaration data, while providing secure access for registered users and administrators.
+- PHP
+- MySQL / MariaDB
+- HTML, CSS, JavaScript
+- PDO (prepared statements)
 
-Users can:
+## Work Distribution (Per Person)
 
-* Register and login securely
-* View protected content
-* Search financial declarations using keywords
-* Access data based on authentication and role
+Each member is assigned pages and works on the page stack (PHP, CSS, and JavaScript where available).
+All module files are shared by all members.
+Database files (`schema.sql`, `seed.sql`, `db.php`) are assigned to Konstandinos Avramidis.
 
----
+- Konstandinos Avramidis
+  - Pages (PHP): `project-root/auth/login.php`, `project-root/auth/logout.php`, `project-root/auth/register.php`, `project-root/submit/dashboard.php`, `project-root/submit/my_submissions.php`, `project-root/submit/profile.php`, `project-root/submit/submit.php`
+  - Page markup: `project-root/submit/submit.html`
+  - Page CSS/JS support (shared where needed): `project-root/assets/css/auth.css`, `project-root/assets/css/submit.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
+  - Database: `project-root/database/schema.sql`, `project-root/database/seed.sql`, `project-root/includes/db.php`
+  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/stats.php`
 
-## ⚙️ Technologies Used
+- Russell Vickramasingam
+  - Pages (PHP): `project-root/index.php`, `project-root/public/public.php`
+  - Page markup: `project-root/public/public.html`
+  - Page CSS/JS: `project-root/assets/css/home.css`, `project-root/assets/css/public.css`, `project-root/assets/css/header.css`, `project-root/assets/css/footer.css`, `project-root/assets/css/list.css`, `project-root/assets/css/declaration.css`, `project-root/assets/css/dashboard.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
+  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/stats.php`
 
-* PHP (Backend)
-* MySQL / MariaDB (Database)
-* HTML / CSS (Frontend)
-* PDO (Secure Database Connection)
+- Alexandros Pelekanos
+  - Pages (PHP): `project-root/admin/admin.php`, `project-root/admin/configure.php`, `project-root/admin/manage_submissions.php`, `project-root/admin/manage_users.php`, `project-root/admin/reports.php`, `project-root/api/index.php`, `project-root/api/declarations.php`, `project-root/api/stats.php`
+  - Page markup: `project-root/admin/admin.html`
+  - Page CSS/JS support: `project-root/assets/css/admin.css`, `project-root/assets/js/header.js`, `project-root/assets/js/footer.js`
+  - Shared modules: `project-root/modules/dashboard.php`, `project-root/modules/declaration.php`, `project-root/modules/list.php`, `project-root/modules/search_dashboard.php`, `project-root/modules/stats.php`
 
----
-
-## 🧱 Backend Implementation (Milestone 2)
-
-The backend system includes:
-
-* Database design using MySQL (**schema.sql**)
-* Demo data (**seed.sql**)
-* Secure PDO connection (**db.php**)
-
-### 🔐 Authentication System:
-
-* User Registration (with validation)
-* Login (with password verification)
-* Logout (session destroy)
-* Session Guard (protected pages)
-
-### 🔍 Core Feature:
-
-* Keyword search in **list.php** using GET method
-
----
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 project-root/
-
-database/
-  ├── schema.sql
-  └── seed.sql
-
-includes/
-  └── db.php
-
-auth/
-  ├── register.php
-  ├── login.php
-  └── logout.php
-
-modules/
-  ├── dashboard.php
-  └── list.php
-
-public/
-  └── index.php
-
-assets/
-
+  index.php
+  setup.php
+  admin/
+    admin.html
+    admin.php
+    configure.php
+    manage_submissions.php
+    manage_users.php
+    reports.php
+  api/
+    declarations.php
+    index.php
+    stats.php
+  assets/
+    css/
+      admin.css
+      auth.css
+      dashboard.css
+      declaration.css
+      footer.css
+      header.css
+      home.css
+      list.css
+      public.css
+      submit.css
+    images/
+    include/
+      footer.html
+      header.html
+    js/
+      footer.js
+      header.js
+  auth/
+    login.php
+    logout.php
+    register.php
+  database/
+    schema.sql
+    seed.sql
+  includes/
+    db.php
+  modules/
+    dashboard.php
+    declaration.php
+    list.php
+    search_dashboard.php
+    stats.php
+  public/
+    public.html
+    public.php
+  submit/
+    dashboard.php
+    my_submissions.php
+    profile.php
+    submit.html
+    submit.php
 README.md
 ```
 
----
+## Database Setup
 
-## 🗄️ Database Setup
-
-1. Open phpMyAdmin
-2. Create a new database:
-
-   ```
-  pothen
-   ```
+1. Open phpMyAdmin.
+2. Create a new database named `pothen`.
 3. Import:
+   - `project-root/database/schema.sql`
+   - `project-root/database/seed.sql`
+4. Verify `project-root/includes/db.php` uses the same database credentials.
 
-   * `database/schema.sql`
-   * `database/seed.sql`
+## How to Run the Project
 
-4. Verify `project-root/includes/db.php` uses the same DB name (`pothen`).
+1. Install and start Apache + MySQL (XAMPP/LAMPP/LAMP).
+2. Place the repository in your web root (for example `htdocs` in XAMPP).
+3. Open:
+   - `http://localhost/POTHENESXE/project-root/index.php`
+4. Optional setup endpoint (if needed by your flow):
+   - `http://localhost/POTHENESXE/project-root/setup.php`
 
----
+## Security Features
 
-## ▶️ How to Run the Project
+- PDO prepared statements to reduce SQL injection risk
+- `password_hash()` for password storage
+- `password_verify()` during authentication
+- Output escaping (for example `htmlspecialchars()`) where needed
+- Session-based authentication and access control
 
-1. Install XAMPP / LAMP (Ubuntu)
+## Features Implemented
 
-2. Place the project inside:
+- User registration, login, and logout
+- User dashboard and personal submission management
+- Declaration listing and detailed declaration pages
+- Search and statistics modules
+- Public-facing pages
+- Admin pages for configuration, users, submissions, and reports
+- API endpoints for declarations and statistics
 
-   ```
-   /var/www/html/   (Linux)
-   ```
+## Repository
 
-   or
+GitHub: https://github.com/Russellvikra/CSE-326.git
 
-   ```
-   htdocs/          (XAMPP)
-   ```
+## Moodle Deliverable Checklist
 
-3. Start Apache & MySQL
-
-4. Open in browser:
-
-   ```
-  http://localhost/CSE-326/project-root/index.php
-   ```
-
-5. Demo login credentials (after seed import):
-
-  * `admin@test.com` / `test123`
-  * `nikos@test.com` / `test123`
-  * `maria@test.com` / `test123`
-
----
-
-## 🔐 Security Features
-
-The application follows secure coding practices:
-
-✔ PDO with Prepared Statements (prevents SQL Injection)
-✔ password_hash() for secure password storage
-✔ password_verify() for authentication
-✔ htmlspecialchars() to prevent XSS attacks
-✔ Session-based authentication (Session Guard)
-✔ No exposure of sensitive database errors
-
----
-
-## 🔍 Features Implemented
-
-* User Registration with validation
-* Secure Login System
-* Logout functionality
-* Protected Dashboard (authenticated users only)
-* Financial declarations listing
-* Keyword Search (GET method, bookmarkable)
-
----
-
-## 📊 Notes
-
-* Each team member has contributed with at least one commit
-* Authentication flow is fully functional
-* The project follows the required folder structure
-* All required security practices have been implemented
-
----
-
-## 📎 Repository
-
-GitHub Repository:
-https://github.com/Russellvikra/CSE-326.git
-
-## 📤 Moodle Deliverable Checklist
-
-* 1 link στο GitHub repository της ομάδας
-* README με ονόματα + AM
-* README με κατανομή εργασιών ανά φοιτητή/αρχείο
-* README με οδηγίες εγκατάστασης LAMP + import `schema.sql` / `seed.sql`
+- GitHub repository link
+- README with names and AM numbers
+- README with work distribution per student/file
+- README with LAMP setup steps and DB import instructions

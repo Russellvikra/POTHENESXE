@@ -1,18 +1,42 @@
 <?php
-header('Content-Type: text/html; charset=UTF-8');
-?>
-<!doctype html>
-<html lang="en">
-<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>API Docs</title></head>
-<body>
-<h1>Pothen Esxes API</h1>
-<ul>
-<li><a href="declarations.php">GET declarations</a></li>
-<li><a href="stats.php">GET stats</a></li>
-</ul>
-<p>Supported query params:</p>
-<ul>
-<li><strong>declarations.php</strong>: keyword, status, year, order(newest|oldest)</li>
-</ul>
-</body>
-</html>
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+	http_response_code(204);
+	exit;
+}
+
+header('Content-Type: application/json; charset=UTF-8');
+
+$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
+$baseDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/api/index.php')), '/');
+$baseUrl = $scheme . '://' . $host . $baseDir;
+
+echo json_encode([
+	'name' => 'Pothen Esxes API',
+	'version' => '1.0',
+	'description' => 'Endpoints for third-party systems to fetch declaration data.',
+	'endpoints' => [
+		[
+			'path' => '/api/declarations.php',
+			'method' => 'GET',
+			'url' => $baseUrl . '/declarations.php',
+			'description' => 'Fetch declarations with optional filters.',
+			'query_params' => [
+				'keyword' => 'Search by year, party, or position',
+				'status' => 'draft|submitted',
+				'year' => 'e.g. 2025',
+				'order' => 'newest|oldest',
+			],
+		],
+		[
+			'path' => '/api/stats.php',
+			'method' => 'GET',
+			'url' => $baseUrl . '/stats.php',
+			'description' => 'Administrative statistics endpoint (admin session required).',
+		],
+	],
+], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

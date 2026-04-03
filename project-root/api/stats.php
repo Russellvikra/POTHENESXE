@@ -1,4 +1,22 @@
 <?php
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
+header('Access-Control-Allow-Origin: *');
+header('Access-Control-Allow-Methods: GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+if (($_SESSION['role'] ?? '') !== 'admin') {
+    http_response_code(403);
+    header('Content-Type: application/json; charset=UTF-8');
+    echo json_encode(['error' => 'Forbidden'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+    exit;
+}
+
 require_once __DIR__ . '/../includes/db.php';
 header('Content-Type: application/json; charset=UTF-8');
 

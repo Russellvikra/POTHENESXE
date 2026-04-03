@@ -5,13 +5,7 @@ require_once __DIR__ . '/../includes/db.php';
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    if (($_SESSION['role'] ?? '') === 'admin') {
-        header('Location: ../admin/admin.php', true, 302);
-    } elseif (($_SESSION['role'] ?? '') === 'politician') {
-        header('Location: ../submit/dashboard.php', true, 302);
-    } else {
-        header('Location: ../modules/search_dashboard.php', true, 302);
-    }
+    header('Location: ../index.php', true, 302);
     exit;
 }
 
@@ -23,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     if (empty($email) || empty($password)) {
-        $error = 'Incorrect login details.';
+        $error = 'Λανθασμένα στοιχεία σύνδεσης.';
     } else {
         try {
             $stmt = $pdo->prepare('SELECT id, username, email, password_hash, role FROM users WHERE email = :email');
@@ -32,24 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user && password_verify($password, $user['password_hash'])) {
                 // Login successful
+                session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
 
-                if ($user['role'] === 'admin') {
-                    header('Location: ../admin/admin.php', true, 302);
-                } elseif ($user['role'] === 'politician') {
-                    header('Location: ../submit/dashboard.php', true, 302);
-                } else {
-                    header('Location: ../modules/search_dashboard.php', true, 302);
-                }
+                header('Location: ../index.php', true, 302);
                 exit;
             } else {
-                $error = 'Incorrect login details.';
+                $error = 'Λανθασμένα στοιχεία σύνδεσης.';
             }
         } catch (PDOException $e) {
-            $error = 'Incorrect login details.';
+            $error = 'Λανθασμένα στοιχεία σύνδεσης.';
         }
     }
 }

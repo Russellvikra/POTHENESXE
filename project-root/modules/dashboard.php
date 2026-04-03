@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-// Session Guard
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
 }
+$activeNav = 'dashboard';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,9 +13,11 @@ if (!isset($_SESSION['user_id'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
+    <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/dashboard.css">
 </head>
 <body>
+    <?php include '../assets/include/header.html'; ?>
     <div class="container">
         <div class="card">
             <h1>Dashboard</h1>
@@ -27,10 +29,6 @@ if (!isset($_SESSION['user_id'])) {
                     <div class="info-value"><?= htmlspecialchars($_SESSION['username']) ?></div>
                 </div>
                 <div class="info-box">
-                    <div class="info-label">Email</div>
-                    <div class="info-value"><?= htmlspecialchars($_SESSION['email']) ?></div>
-                </div>
-                <div class="info-box">
                     <div class="info-label">Role</div>
                     <div class="info-value"><?= htmlspecialchars($_SESSION['role']) ?></div>
                 </div>
@@ -40,5 +38,6 @@ if (!isset($_SESSION['user_id'])) {
             <a href="../auth/logout.php" style="background: #c82c3b; margin-left: 10px;">Logout</a>
         </div>
     </div>
+    <script src="../assets/js/header.js"></script>
 </body>
 </html>
