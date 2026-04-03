@@ -17,11 +17,30 @@ $activeNav = 'submit';
 <?php include '../assets/include/header.html'; ?>
 <main class="page-wrap">
     <section class="card">
-        <h1>Submit Module Dashboard</h1>
-        <p>Choose an action.</p>
-        <div class="row two-col">
-            <a href="profile.php" class="clear-link">My Profile</a>
-            <a href="my_submissions.php" class="clear-link">My Submissions</a>
+        <div class="card-header">
+            <h1>Declaration Portal</h1>
+            <p class="card-subtitle">Manage your asset declarations</p>
+        </div>
+
+        <div class="dashboard-grid dashboard-submit">
+            <a href="submit.php" class="dashboard-card">
+                <div class="card-icon">📄</div>
+                <h3>New Declaration</h3>
+                <p>Create and submit a new asset declaration</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="my_submissions.php" class="dashboard-card">
+                <div class="card-icon">📋</div>
+                <h3>My Submissions</h3>
+                <p>View and manage your declaration history</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="profile.php" class="dashboard-card">
+                <div class="card-icon">👤</div>
+                <h3>My Profile</h3>
+                <p>Edit your profile and password</p>
+                <span class="card-arrow">→</span>
+            </a>
         </div>
     </section>
 </main>

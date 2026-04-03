@@ -126,58 +126,97 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 <body>
 <main class="page-wrap">
     <section class="card">
-        <h1>Manage Users</h1>
-        <?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
+        <div class="card-header">
+            <h1>Manage Users</h1>
+            <p class="card-subtitle">Add, edit, and remove user accounts</p>
+        </div>
+        <?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 
-        <h2>Add User</h2>
-        <form method="POST" class="filter-form">
-            <input type="hidden" name="action" value="add">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <select name="role">
-                <option value="user">User</option>
-                <option value="politician">Politician</option>
-                <option value="admin">Admin</option>
-            </select>
-            <input type="password" name="password" placeholder="Password (min 8)" required>
-            <button type="submit">Add</button>
-        </form>
+        <div class="form-section">
+            <h2>➕ Add New User</h2>
+            <form method="POST" class="form-grid">
+                <input type="hidden" name="action" value="add">
+                <div class="form-row">
+                    <div>
+                        <label for="username">Username</label>
+                        <input type="text" id="username" name="username" placeholder="Enter username" required>
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" placeholder="user@example.com" required>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label for="role">Role</label>
+                        <select id="role" name="role">
+                            <option value="user">User</option>
+                            <option value="politician">Politician</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" placeholder="Minimum 8 characters" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">Add User</button>
+            </form>
+        </div>
     </section>
 
     <section class="card">
+        <h2>Users Directory</h2>
         <div class="table-wrap">
-            <table>
-                <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Created</th><th>Actions</th></tr></thead>
-                <tbody>
-                <?php foreach ($users as $user): ?>
+            <table class="data-table">
+                <thead>
                     <tr>
-                        <td><?= (int) $user['id'] ?></td>
-                        <td><?= esc((string) $user['username']) ?></td>
+                        <th>ID</th>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Role</th>
+                        <th>Created</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php if (count($users) === 0): ?>
+                    <tr><td colspan="6" class="text-center text-muted">No users found</td></tr>
+                <?php else: ?>
+                    <?php foreach ($users as $user): ?>
+                    <tr>
+                        <td><span class="badge badge-id"><?= (int) $user['id'] ?></span></td>
+                        <td><strong><?= esc((string) $user['username']) ?></strong></td>
                         <td><?= esc((string) $user['email']) ?></td>
-                        <td><?= esc((string) $user['role']) ?></td>
-                        <td><?= esc((string) $user['created_at']) ?></td>
+                        <td><span class="role-badge role-<?= strtolower(esc((string) $user['role'])) ?>"><?= esc((string) $user['role']) ?></span></td>
+                        <td><small class="text-muted"><?= esc((string) $user['created_at']) ?></small></td>
                         <td>
-                            <form method="POST" class="inline-form" style="margin-bottom:6px;">
-                                <input type="hidden" name="action" value="update">
-                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
-                                <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" required>
-                                <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" required>
-                                <input type="password" name="new_password" placeholder="New password (optional)">
-                                <select name="role">
-                                    <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
-                                    <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>
-                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                                <button type="submit">Update</button>
-                            </form>
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="remove">
-                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
-                                <button type="submit">Remove</button>
-                            </form>
+                            <div class="action-buttons">
+                                <form method="POST" class="inline-form">
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
+                                    <div class="edit-row">
+                                        <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" placeholder="Username" required>
+                                        <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" placeholder="Email" required>
+                                        <input type="password" name="new_password" placeholder="New password (opt)">
+                                        <select name="role">
+                                            <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
+                                            <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>
+                                            <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                        </select>
+                                        <button type="submit" class="btn btn-sm btn-success">✓ Update</button>
+                                    </div>
+                                </form>
+                                <form method="POST" class="inline-form" style="margin-top: 6px;">
+                                    <input type="hidden" name="action" value="remove">
+                                    <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
+                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove user?')">✕ Delete</button>
+                                </form>
+                            </div>
                         </td>
                     </tr>
-                <?php endforeach; ?>
+                    <?php endforeach; ?>
+                <?php endif; ?>
                 </tbody>
             </table>
         </div>

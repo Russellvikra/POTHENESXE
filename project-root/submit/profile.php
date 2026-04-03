@@ -48,12 +48,40 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My Profile</title><link rel="stylesheet" href="../assets/css/header.css"><link rel="stylesheet" href="../assets/css/submit.css"></head><body>
 <?php include '../assets/include/header.html'; ?>
-<main class="page-wrap"><section class="card"><h1>My Profile</h1><?php if ($message !== ''): ?><div class="success"><?= esc($message) ?></div><?php endif; ?>
+<main class="page-wrap"><section class="card">
+<div class="card-header">
+    <h1>My Profile</h1>
+    <p class="card-subtitle">Update your account information</p>
+</div>
+<?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 <form method="POST" class="submit-form">
-<label>Username</label><input type="text" name="username" value="<?= esc((string)$user['username']) ?>" required>
-<label>Email (read-only)</label><input type="email" value="<?= esc((string)$user['email']) ?>" readonly>
-<label>New Password (optional)</label><input type="password" name="new_password" placeholder="At least 8 characters">
-<button type="submit">Save Profile</button>
+<div class="form-section">
+    <h2>Account Information</h2>
+    <div class="form-row">
+        <div>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="<?= esc((string)$user['username']) ?>" required>
+        </div>
+        <div>
+            <label for="email">Email (read-only)</label>
+            <input type="email" id="email" value="<?= esc((string)$user['email']) ?>" readonly>
+        </div>
+    </div>
+</div>
+<div class="form-section">
+    <h2>Security</h2>
+    <div class="form-row">
+        <div>
+            <label for="new-password">New Password (optional)</label>
+            <input type="password" id="new-password" name="new_password" placeholder="Leave blank to keep current password">
+            <small class="form-help">Minimum 8 characters if changing</small>
+        </div>
+    </div>
+</div>
+<div class="form-actions">
+    <button type="submit" class="btn btn-primary">Save Profile</button>
+    <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
+</div>
 </form>
 </section></main></body></html>
 <script src="../assets/js/header.js"></script>

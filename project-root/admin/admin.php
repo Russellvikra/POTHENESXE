@@ -36,30 +36,36 @@ function esc(string $value): string
 
 <main class="page-wrap">
     <section class="card">
-        <h1>Admin Dashboard</h1>
-        <p>Choose an administration section.</p>
+        <div class="card-header">
+            <h1>Admin Dashboard</h1>
+            <p class="card-subtitle">Administrative controls & system management</p>
+        </div>
 
-        <div class="stats-grid">
-            <article>
-                <p class="label">Manage Users</p>
-                <p class="value">Users</p>
-                <a href="manage_users.php" class="clear-link">Open</a>
-            </article>
-            <article>
-                <p class="label">Manage Submissions</p>
-                <p class="value">Declarations</p>
-                <a href="manage_submissions.php" class="clear-link">Open</a>
-            </article>
-            <article>
-                <p class="label">Configure System</p>
-                <p class="value">Settings</p>
-                <a href="configure.php" class="clear-link">Open</a>
-            </article>
-            <article>
-                <p class="label">Reports</p>
-                <p class="value">Statistics</p>
-                <a href="reports.php" class="clear-link">Open</a>
-            </article>
+        <div class="stats-grid dashboard-grid">
+            <a href="manage_users.php" class="dashboard-card">
+                <div class="card-icon users-icon">👥</div>
+                <h3>Manage Users</h3>
+                <p>Add, edit, and manage user accounts and roles</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="manage_submissions.php" class="dashboard-card">
+                <div class="card-icon submissions-icon">📋</div>
+                <h3>Manage Submissions</h3>
+                <p>Review and manage asset declarations</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="configure.php" class="dashboard-card">
+                <div class="card-icon config-icon">⚙️</div>
+                <h3>Configure System</h3>
+                <p>Set up parties, positions, and system settings</p>
+                <span class="card-arrow">→</span>
+            </a>
+            <a href="reports.php" class="dashboard-card">
+                <div class="card-icon reports-icon">📊</div>
+                <h3>Reports & Analytics</h3>
+                <p>View statistics and system reports</p>
+                <span class="card-arrow">→</span>
+            </a>
         </div>
     </section>
 </main>

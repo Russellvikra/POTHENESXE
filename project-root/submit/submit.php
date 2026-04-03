@@ -147,18 +147,21 @@ function esc(string $value): string
 <?php include '../assets/include/header.html'; ?>
 <main class="page-wrap">
     <section class="card">
-        <h1>Submit Declaration</h1>
-        <p>Create a new declaration and include one or more asset records.</p>
+        <div class="card-header">
+            <h1>Submit Declaration</h1>
+            <p class="card-subtitle">Create and submit your asset declaration</p>
+        </div>
 
         <?php if ($successId): ?>
-            <div class="success">
-                Declaration #<?= (int) $successId ?> was saved successfully.
-                <a href="../modules/declaration.php?id=<?= (int) $successId ?>">Open declaration</a>
+            <div class="alert alert-success">
+                <strong>✓ Success!</strong> Declaration #<?= (int) $successId ?> was saved.
+                <br><a href="../modules/declaration.php?id=<?= (int) $successId ?>">View declaration →</a>
             </div>
         <?php endif; ?>
 
         <?php if (count($errors) > 0): ?>
-            <div class="errors">
+            <div class="alert alert-error">
+                <strong>⚠️ Please fix the following errors:</strong>
                 <ul>
                     <?php foreach ($errors as $error): ?>
                         <li><?= esc($error) ?></li>
@@ -168,52 +171,60 @@ function esc(string $value): string
         <?php endif; ?>
 
         <form method="POST" class="submit-form">
-            <div class="row two-col">
-                <div>
-                    <label for="year">Declaration Year</label>
-                    <input
-                        type="number"
-                        id="year"
-                        name="year"
-                        min="2000"
-                        max="2100"
-                        value="<?= esc((string) ($_POST['year'] ?? date('Y'))) ?>"
-                        required
-                    >
-                </div>
-                <div>
-                    <label for="status">Status</label>
-                    <select id="status" name="status">
-                        <option value="draft" <?= (($_POST['status'] ?? 'draft') === 'draft') ? 'selected' : '' ?>>Draft</option>
-                        <option value="submitted" <?= (($_POST['status'] ?? '') === 'submitted') ? 'selected' : '' ?>>Submitted</option>
-                    </select>
+            <div class="form-section">
+                <h2>Declaration Details</h2>
+                <div class="form-row two-col">
+                    <div>
+                        <label for="year">Declaration Year *</label>
+                        <input
+                            type="number"
+                            id="year"
+                            name="year"
+                            min="2000"
+                            max="2100"
+                            value="<?= esc((string) ($_POST['year'] ?? date('Y'))) ?>"
+                            required
+                        >
+                    </div>
+                    <div>
+                        <label for="status">Status *</label>
+                        <select id="status" name="status">
+                            <option value="draft" <?= (($_POST['status'] ?? 'draft') === 'draft') ? 'selected' : '' ?>>Draft (Not Submitted)</option>
+                            <option value="submitted" <?= (($_POST['status'] ?? '') === 'submitted') ? 'selected' : '' ?>>Submitted</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
-            <h2>Assets</h2>
-            <p class="hint">Add each asset on a separate row.</p>
+            <div class="form-section">
+                <h2>Assets</h2>
+                <p class="form-hint">Add each asset on a separate row. All fields are required for each row.</p>
 
-            <div class="assets-grid assets-head">
-                <span>Type</span>
-                <span>Description</span>
-                <span>Value (EUR)</span>
+                <div class="assets-header">
+                    <span class="asset-type">Type</span>
+                    <span class="asset-description">Description</span>
+                    <span class="asset-value">Value (EUR)</span>
+                </div>
+
+                <?php
+                $postedTypes = $_POST['asset_type'] ?? ['', '', ''];
+                $postedDescriptions = $_POST['asset_description'] ?? ['', '', ''];
+                $postedValues = $_POST['asset_value'] ?? ['', '', ''];
+                $rows = max(count($postedTypes), 3);
+                for ($i = 0; $i < $rows; $i++):
+                ?>
+                    <div class="asset-row">
+                        <input type="text" name="asset_type[]" value="<?= esc((string) ($postedTypes[$i] ?? '')) ?>" placeholder="e.g., house, car, bank account">
+                        <input type="text" name="asset_description[]" value="<?= esc((string) ($postedDescriptions[$i] ?? '')) ?>" placeholder="Details about the asset">
+                        <input type="number" name="asset_value[]" value="<?= esc((string) ($postedValues[$i] ?? '')) ?>" min="0" step="0.01" placeholder="0.00">
+                    </div>
+                <?php endfor; ?>
             </div>
 
-            <?php
-            $postedTypes = $_POST['asset_type'] ?? ['deposit', '', ''];
-            $postedDescriptions = $_POST['asset_description'] ?? ['', '', ''];
-            $postedValues = $_POST['asset_value'] ?? ['', '', ''];
-            $rows = max(count($postedTypes), 3);
-            for ($i = 0; $i < $rows; $i++):
-            ?>
-                <div class="assets-grid">
-                    <input type="text" name="asset_type[]" value="<?= esc((string) ($postedTypes[$i] ?? '')) ?>" placeholder="e.g. house">
-                    <input type="text" name="asset_description[]" value="<?= esc((string) ($postedDescriptions[$i] ?? '')) ?>" placeholder="Asset details">
-                    <input type="number" name="asset_value[]" value="<?= esc((string) ($postedValues[$i] ?? '')) ?>" min="0" step="0.01" placeholder="0.00">
-                </div>
-            <?php endfor; ?>
-
-            <button type="submit">Save Declaration</button>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary btn-lg">Save Declaration</button>
+                <a href="my_submissions.php" class="btn btn-secondary btn-lg">Cancel</a>
+            </div>
         </form>
     </section>
 </main>

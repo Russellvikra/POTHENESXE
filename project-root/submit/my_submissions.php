@@ -40,8 +40,50 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>My Submissions</title><link rel="stylesheet" href="../assets/css/header.css"><link rel="stylesheet" href="../assets/css/submit.css"><link rel="stylesheet" href="../assets/css/admin.css"></head><body>
 <?php include '../assets/include/header.html'; ?>
-<main class="page-wrap"><section class="card"><h1>My Submissions</h1>
-<form method="GET" class="filter-form"><select name="status"><option value="">All</option><option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option></select><select name="order"><option value="newest" <?= $order === 'DESC' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $order === 'ASC' ? 'selected' : '' ?>>Oldest</option></select><button type="submit">Apply</button></form>
+<main class="page-wrap">
+<section class="card">
+<div class="card-header">
+    <h1>My Submissions</h1>
+    <p class="card-subtitle">Your declaration history</p>
+</div>
+<form method="GET" class="filter-bar">
+    <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" name="status">
+            <option value="">All Statuses</option>
+            <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
+            <option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="order-filter">Sort:</label>
+        <select id="order-filter" name="order">
+            <option value="newest" <?= $order === 'DESC' ? 'selected' : '' ?>>Newest First</option>
+            <option value="oldest" <?= $order === 'ASC' ? 'selected' : '' ?>>Oldest First</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary">Apply Filters</button>
+    <a href="submit.php" class="btn btn-sm btn-success">+ New Declaration</a>
+</form>
 </section>
-<section class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>Year</th><th>Status</th><th>Total</th><th>Created</th></tr></thead><tbody><?php foreach ($rows as $row): ?><tr><td><a href="../modules/declaration.php?id=<?= (int)$row['id'] ?>">#<?= (int)$row['id'] ?></a></td><td><?= esc((string)$row['year']) ?></td><td><?= esc((string)$row['status']) ?></td><td>EUR <?= number_format((float)$row['total'],2) ?></td><td><?= esc((string)$row['created_at']) ?></td></tr><?php endforeach; ?></tbody></table></div></section></main></body></html>
+<section class="card">
+<div class="table-wrap">
+<table class="data-table">
+<thead><tr><th>Declaration</th><th>Year</th><th>Status</th><th>Total Value</th><th>Created</th><th>View</th></tr></thead><tbody>
+<?php if (count($rows) === 0): ?>
+    <tr><td colspan="6" class="text-center text-muted">No submissions yet. <a href="submit.php">Create one now</a></td></tr>
+<?php else: ?>
+    <?php foreach ($rows as $row): ?>
+    <tr>
+    <td><strong>#<?= (int)$row['id'] ?></strong></td>
+    <td><?= esc((string)$row['year']) ?></td>
+    <td><span class="status-badge status-<?= strtolower($row['status']) ?>"><?= ucfirst(esc((string)$row['status'])) ?></span></td>
+    <td><strong>EUR <?= number_format((float)$row['total'],2) ?></strong></td>
+    <td><small class="text-muted"><?= esc((string)$row['created_at']) ?></small></td>
+    <td><a href="../modules/declaration.php?id=<?= (int)$row['id'] ?>" class="btn btn-sm btn-primary">View</a></td>
+    </tr>
+    <?php endforeach; ?>
+<?php endif; ?>
+</tbody></table></div></section></main>
 <script src="../assets/js/header.js"></script>
+</body></html>

@@ -54,17 +54,50 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Submissions</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body>
 <main class="page-wrap">
-<section class="card"><h1>Manage Submissions</h1><?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
-<form method="GET" class="filter-form">
-<select name="status"><option value="">All status</option><option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option></select>
-<select name="order"><option value="newest" <?= $order === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $order === 'oldest' ? 'selected' : '' ?>>Oldest</option></select>
-<button type="submit">Apply</button></form></section>
-<section class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>User</th><th>Year</th><th>Status</th><th>Total</th><th>Created</th><th>Action</th></tr></thead><tbody>
-<?php foreach ($rows as $row): ?><tr>
-<td><a href="../modules/declaration.php?id=<?= (int)$row['id'] ?>">#<?= (int)$row['id'] ?></a></td>
-<td><?= esc((string)$row['username']) ?></td><td><?= esc((string)$row['year']) ?></td><td><?= esc((string)$row['status']) ?></td><td>EUR <?= number_format((float)$row['total'],2) ?></td><td><?= esc((string)$row['created_at']) ?></td>
-<td><form method="POST" class="inline-form"><input type="hidden" name="id" value="<?= (int)$row['id'] ?>"><select name="status"><option value="draft" <?= $row['status'] === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $row['status'] === 'submitted' ? 'selected' : '' ?>>Submitted</option></select><button type="submit">Save</button></form></td>
-</tr><?php endforeach; ?>
+<section class="card">
+<div class="card-header">
+    <h1>Manage Submissions</h1>
+    <p class="card-subtitle">Review and manage asset declarations</p>
+</div>
+<?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
+<form method="GET" class="filter-bar">
+    <div class="filter-group">
+        <label for="status-filter">Status:</label>
+        <select id="status-filter" name="status">
+            <option value="">All Statuses</option>
+            <option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option>
+            <option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option>
+        </select>
+    </div>
+    <div class="filter-group">
+        <label for="order-filter">Sort:</label>
+        <select id="order-filter" name="order">
+            <option value="newest" <?= $order === 'newest' ? 'selected' : '' ?>>Newest First</option>
+            <option value="oldest" <?= $order === 'oldest' ? 'selected' : '' ?>>Oldest First</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary">Apply Filters</button>
+</form>
+</section>
+<section class="card">
+<div class="table-wrap">
+<table class="data-table">
+<thead><tr><th>Declaration ID</th><th>User</th><th>Year</th><th>Status</th><th>Total Value</th><th>Created</th><th>Action</th></tr></thead><tbody>
+<?php if (count($rows) === 0): ?>
+    <tr><td colspan="7" class="text-center text-muted">No submissions found</td></tr>
+<?php else: ?>
+    <?php foreach ($rows as $row): ?>
+    <tr>
+    <td><a href="../modules/declaration.php?id=<?= (int)$row['id'] ?>" class="link-primary"><strong>#<?= (int)$row['id'] ?></strong></a></td>
+    <td><?= esc((string)$row['username']) ?></td>
+    <td><strong><?= esc((string)$row['year']) ?></strong></td>
+    <td><span class="status-badge status-<?= strtolower($row['status']) ?>"><?= ucfirst(esc((string)$row['status'])) ?></span></td>
+    <td><strong>EUR <?= number_format((float)$row['total'],2) ?></strong></td>
+    <td><small class="text-muted"><?= esc((string)$row['created_at']) ?></small></td>
+    <td><form method="POST" class="inline-form"><input type="hidden" name="id" value="<?= (int)$row['id'] ?>"><div class="action-select"><select name="status" class="select-sm"><option value="draft" <?= $row['status'] === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $row['status'] === 'submitted' ? 'selected' : '' ?>>Submitted</option></select><button type="submit" class="btn btn-sm btn-primary">Save</button></div></form></td>
+    </tr>
+    <?php endforeach; ?>
+<?php endif; ?>
 </tbody></table></div></section></main>
 <script src="../assets/js/header.js"></script>
 </body></html>
