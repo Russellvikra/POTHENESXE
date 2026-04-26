@@ -3,10 +3,12 @@ require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
 }
+// Action: Restrict this page to admin users only.
 if (($_SESSION['role'] ?? '') !== 'admin') {
     http_response_code(403);
     exit('403 Forbidden');
@@ -14,6 +16,7 @@ if (($_SESSION['role'] ?? '') !== 'admin') {
 
 $message = '';
 
+// Action: Handle admin user actions (add, update, remove) submitted from forms.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? '';
 
@@ -26,6 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($username !== '' && filter_var($email, FILTER_VALIDATE_EMAIL) && strlen($password) >= 8) {
                 $role = in_array($role, ['admin', 'politician', 'user'], true) ? $role : 'user';
+                // Action: Insert new user record with hashed password.
                 $stmt = $pdo->prepare('INSERT INTO users (username, email, password_hash, role) VALUES (:u,:e,:p,:r)');
                 $stmt->execute([
                     'u' => $username,
@@ -35,6 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
 
                 if ($role === 'politician') {
+                    // Action: Link newly created politician user to politicians table.
                     $userId = (int) $pdo->lastInsertId();
                     $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) VALUES (:user_id)');
                     $linkStmt->execute(['user_id' => $userId]);
@@ -61,6 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if (strlen($newPassword) < 8) {
                         $message = 'Password must be at least 8 characters.';
                     } else {
+                        // Action: Update profile fields and replace password hash.
                         $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r, password_hash = :p WHERE id = :id');
                         $stmt->execute([
                             'u' => $username,
@@ -71,6 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         ]);
 
                         if ($role === 'politician' && $existingRole !== 'politician') {
+                            // Action: Ensure politician profile exists after role promotion.
                             $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) SELECT :user_id WHERE NOT EXISTS (SELECT 1 FROM politicians WHERE user_id = :user_id)');
                             $linkStmt->execute(['user_id' => $id]);
                         }
@@ -78,6 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $message = 'User updated.';
                     }
                 } else {
+                    // Action: Update profile fields while keeping existing password.
                     $stmt = $pdo->prepare('UPDATE users SET username = :u, email = :e, role = :r WHERE id = :id');
                     $stmt->execute([
                         'u' => $username,
@@ -87,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ]);
 
                     if ($role === 'politician' && $existingRole !== 'politician') {
+                        // Action: Ensure politician profile exists after role promotion.
                         $linkStmt = $pdo->prepare('INSERT INTO politicians (user_id) SELECT :user_id WHERE NOT EXISTS (SELECT 1 FROM politicians WHERE user_id = :user_id)');
                         $linkStmt->execute(['user_id' => $id]);
                     }
@@ -99,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($action === 'remove') {
             $id = (int) ($_POST['id'] ?? 0);
             if ($id > 0 && $id !== (int) $_SESSION['user_id']) {
+                // Action: Remove selected user (except currently logged-in admin).
                 $stmt = $pdo->prepare('DELETE FROM users WHERE id = :id');
                 $stmt->execute(['id' => $id]);
                 $message = 'User removed.';
@@ -132,6 +142,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
         </div>
         <?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 
+<<<<<<< HEAD
         <div class="form-section">
             <h2>➕ Add New User</h2>
             <form method="POST" class="form-grid">
@@ -163,6 +174,22 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                 <button type="submit" class="btn btn-primary">Add User</button>
             </form>
         </div>
+=======
+        <h2>Add User</h2>
+        <!-- Action: Submit form to create a new user account. -->
+        <form method="POST" class="filter-form">
+            <input type="hidden" name="action" value="add">
+            <input type="text" name="username" placeholder="Username" required>
+            <input type="email" name="email" placeholder="Email" required>
+            <select name="role">
+                <option value="user">User</option>
+                <option value="politician">Politician</option>
+                <option value="admin">Admin</option>
+            </select>
+            <input type="password" name="password" placeholder="Password (min 8)" required>
+            <button type="submit">Add</button>
+        </form>
+>>>>>>> e7daf47 (added comments)
     </section>
 
     <section class="card">
@@ -191,6 +218,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                         <td><span class="role-badge role-<?= strtolower(esc((string) $user['role'])) ?>"><?= esc((string) $user['role']) ?></span></td>
                         <td><small class="text-muted"><?= esc((string) $user['created_at']) ?></small></td>
                         <td>
+<<<<<<< HEAD
                             <div class="action-buttons">
                                 <form method="POST" class="inline-form">
                                     <input type="hidden" name="action" value="update">
@@ -213,6 +241,28 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove user?')">✕ Delete</button>
                                 </form>
                             </div>
+=======
+                            <!-- Action: Submit form to update an existing user. -->
+                            <form method="POST" class="inline-form" style="margin-bottom:6px;">
+                                <input type="hidden" name="action" value="update">
+                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
+                                <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" required>
+                                <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" required>
+                                <input type="password" name="new_password" placeholder="New password (optional)">
+                                <select name="role">
+                                    <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
+                                    <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>
+                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+                            <!-- Action: Submit form to remove this user account. -->
+                            <form method="POST" class="inline-form">
+                                <input type="hidden" name="action" value="remove">
+                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
+                                <button type="submit">Remove</button>
+                            </form>
+>>>>>>> e7daf47 (added comments)
                         </td>
                     </tr>
                     <?php endforeach; ?>

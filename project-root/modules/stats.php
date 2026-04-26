@@ -2,11 +2,13 @@
 require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
 }
 
+// Action: Restrict statistics page access to admin users.
 if (($_SESSION['role'] ?? '') !== 'admin') {
     http_response_code(403);
     echo '403 Forbidden';
@@ -15,14 +17,17 @@ if (($_SESSION['role'] ?? '') !== 'admin') {
 
 require_once __DIR__ . '/../includes/db.php';
 
+// Action: Query declaration totals grouped by year.
 $byYearStmt = $pdo->prepare('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC');
 $byYearStmt->execute();
 $byYear = $byYearStmt->fetchAll();
 
+// Action: Query declaration totals grouped by party.
 $byPartyStmt = $pdo->prepare('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC');
 $byPartyStmt->execute();
 $byParty = $byPartyStmt->fetchAll();
 
+// Action: Query asset counts and total value grouped by type.
 $assetTypesStmt = $pdo->prepare('SELECT type, COUNT(*) AS cnt, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC');
 $assetTypesStmt->execute();
 $assetTypes = $assetTypesStmt->fetchAll();

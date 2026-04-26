@@ -2,15 +2,18 @@
 require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 
+// Action: Set CORS headers so external systems can call this endpoint.
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
+// Action: Respond to CORS preflight checks without processing API logic.
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
 	http_response_code(204);
 	exit;
 }
 
+// Action: Return unauthorized response when no authenticated session exists.
 if (!isset($_SESSION['user_id'])) {
 	http_response_code(401);
 	header('Content-Type: application/json; charset=UTF-8');
@@ -25,6 +28,7 @@ $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $baseDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/api/index.php')), '/');
 $baseUrl = $scheme . '://' . $host . $baseDir;
 
+// Action: Return API metadata and available endpoint definitions.
 echo json_encode([
 	'name' => 'Pothen Esxes API',
 	'version' => '1.0',

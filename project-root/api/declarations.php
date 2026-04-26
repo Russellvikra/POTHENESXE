@@ -3,15 +3,18 @@ require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 
 require_once __DIR__ . '/../includes/db.php';
+// Action: Set CORS headers so external systems can call this endpoint.
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
+// Action: Respond to CORS preflight checks without running query logic.
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
     http_response_code(204);
     exit;
 }
 
+// Action: Return unauthorized response when session is missing.
 if (!isset($_SESSION['user_id'])) {
     http_response_code(401);
     header('Content-Type: application/json; charset=UTF-8');
@@ -29,6 +32,7 @@ $status = in_array($status, ['draft', 'submitted'], true) ? $status : '';
 $year = $year ?: null;
 $keywordLike = '%' . $keyword . '%';
 
+// Action: Query declarations using optional keyword, status, year, and order filters.
 $stmt = $pdo->prepare(
     'SELECT d.id, d.year, d.status, d.created_at,
             p.position, COALESCE(pa.name, "N/A") AS party
@@ -56,6 +60,7 @@ $stmt->execute([
     'order_mode' => $orderMode,
 ]);
 
+// Action: Return filtered declaration results as JSON.
 echo json_encode([
     'count' => $stmt->rowCount(),
     'data' => $stmt->fetchAll(),

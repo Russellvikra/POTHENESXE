@@ -1,5 +1,6 @@
 <?php
 session_start();
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
@@ -13,6 +14,7 @@ $keyword = trim($_GET['keyword'] ?? '');
 $declarations = [];
 $searchPerformed = $keyword !== '';
 
+// Action: Run declaration search when a keyword is provided.
 if ($searchPerformed) {
     try {
         $stmt = $pdo->prepare(
@@ -50,8 +52,10 @@ if ($searchPerformed) {
 
             <form method="GET" class="search-box">
                 <input type="text" name="keyword" placeholder="Search by keyword, title, or year..." value="<?= htmlspecialchars($keyword) ?>">
+                <!-- Action: Submit search keyword and refresh result list. -->
                 <button type="submit">Search</button>
                 <?php if (!empty($keyword)): ?>
+                    <!-- Action: Clear current keyword and reset search results. -->
                     <a href="list.php" class="clear-btn" style="display: inline-block; text-decoration: none; color: #fff; padding: 10px 16px;">Clear</a>
                 <?php endif; ?>
             </form>
@@ -76,6 +80,7 @@ if ($searchPerformed) {
                         <tbody>
                             <?php foreach ($declarations as $decl): ?>
                                 <tr>
+                                    <!-- Action: Open details page for this declaration record. -->
                                     <td><a href="../modules/declaration.php?id=<?= (int) $decl['id'] ?>">#<?= (int) $decl['id'] ?></a></td>
                                     <td><?= htmlspecialchars($decl['username'] ?? 'N/A') ?></td>
                                     <td><?= htmlspecialchars($decl['title'] ?? 'N/A') ?></td>

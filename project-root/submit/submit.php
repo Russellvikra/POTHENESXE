@@ -4,11 +4,13 @@ app_session_start();
 
 require_once __DIR__ . '/../includes/db.php';
 
+// Action: Redirect unauthenticated users to the login page.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
 }
 
+// Action: Allow only politicians to access declaration submission.
 if (($_SESSION['role'] ?? '') !== 'politician') {
     http_response_code(403);
     exit('403 Forbidden');
@@ -20,6 +22,7 @@ $successId = filter_input(INPUT_GET, 'success_id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1],
 ]);
 
+// Action: Run the declaration save workflow after form submission.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $year = filter_input(INPUT_POST, 'year', FILTER_VALIDATE_INT, [
         'options' => ['min_range' => 2000, 'max_range' => 2100],
@@ -70,6 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (count($errors) === 0) {
         try {
+            // Action: Start a transaction so declaration and assets are saved as one unit.
             $pdo->beginTransaction();
 
             $profileStmt = $pdo->prepare('SELECT id FROM politicians WHERE user_id = :user_id LIMIT 1');
@@ -79,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($politician) {
                 $politicianId = (int) $politician['id'];
             } else {
+                // Action: Create a politician profile automatically when one does not exist.
                 $insertPoliticianStmt = $pdo->prepare(
                     'INSERT INTO politicians (user_id, party_id, position) VALUES (:user_id, :party_id, :position)'
                 );
@@ -100,6 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'status' => $status,
             ]);
 
+            // Action: Capture the new declaration ID to attach all related asset rows.
             $declarationId = (int) $pdo->lastInsertId();
 
             $insertAssetStmt = $pdo->prepare(
@@ -116,6 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
             }
 
+            // Action: Commit saved data and redirect back with the success identifier.
             $pdo->commit();
             header('Location: submit.php?success_id=' . $declarationId, true, 302);
             exit;
@@ -153,9 +160,16 @@ function esc(string $value): string
         </div>
 
         <?php if ($successId): ?>
+<<<<<<< HEAD
             <div class="alert alert-success">
                 <strong>✓ Success!</strong> Declaration #<?= (int) $successId ?> was saved.
                 <br><a href="../modules/declaration.php?id=<?= (int) $successId ?>">View declaration →</a>
+=======
+            <div class="success">
+                Declaration #<?= (int) $successId ?> was saved successfully.
+                <!-- Action: Open the full declaration details page for this saved record. -->
+                <a href="../modules/declaration.php?id=<?= (int) $successId ?>">Open declaration</a>
+>>>>>>> e7daf47 (added comments)
             </div>
         <?php endif; ?>
 
@@ -221,10 +235,29 @@ function esc(string $value): string
                 <?php endfor; ?>
             </div>
 
+<<<<<<< HEAD
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary btn-lg">Save Declaration</button>
                 <a href="my_submissions.php" class="btn btn-secondary btn-lg">Cancel</a>
             </div>
+=======
+            <?php
+            $postedTypes = $_POST['asset_type'] ?? ['deposit', '', ''];
+            $postedDescriptions = $_POST['asset_description'] ?? ['', '', ''];
+            $postedValues = $_POST['asset_value'] ?? ['', '', ''];
+            $rows = max(count($postedTypes), 3);
+            for ($i = 0; $i < $rows; $i++):
+            ?>
+                <div class="assets-grid">
+                    <input type="text" name="asset_type[]" value="<?= esc((string) ($postedTypes[$i] ?? '')) ?>" placeholder="e.g. house">
+                    <input type="text" name="asset_description[]" value="<?= esc((string) ($postedDescriptions[$i] ?? '')) ?>" placeholder="Asset details">
+                    <input type="number" name="asset_value[]" value="<?= esc((string) ($postedValues[$i] ?? '')) ?>" min="0" step="0.01" placeholder="0.00">
+                </div>
+            <?php endfor; ?>
+
+            <!-- Action: Submit the declaration form together with all asset rows. -->
+            <button type="submit">Save Declaration</button>
+>>>>>>> e7daf47 (added comments)
         </form>
     </section>
 </main>

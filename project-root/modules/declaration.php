@@ -4,6 +4,7 @@ app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 $activeNav = 'declaration';
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
@@ -17,6 +18,7 @@ $declaration = null;
 $recentDeclarations = [];
 $errorMessage = '';
 
+// Action: If an ID is provided, load that declaration; otherwise load recent declarations.
 if ($declarationId) {
     $statement = $pdo->prepare(
         'SELECT d.id, d.year, d.status, d.created_at,
@@ -125,6 +127,7 @@ function esc(string $value): string
                                     <strong>#<?= (int) $recent['id'] ?></strong>
                                     <span><?= esc((string) ($recent['party_name'] ?? 'N/A')) ?> - <?= esc((string) ($recent['position'] ?? 'N/A')) ?> - <?= esc((string) $recent['year']) ?></span>
                                 </div>
+                                <!-- Action: Open details page for selected declaration. -->
                                 <a href="declaration.php?id=<?= (int) $recent['id'] ?>" class="btn-link">Open</a>
                             </li>
                         <?php endforeach; ?>

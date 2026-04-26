@@ -3,17 +3,21 @@ require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 $activeNav = 'submit';
+// Action: Redirect unauthenticated users to the login page.
 if (!isset($_SESSION['user_id'])) { header('Location: ../auth/login.php', true, 302); exit; }
+// Action: Restrict profile management to users with the politician role.
 if (($_SESSION['role'] ?? '') !== 'politician') { http_response_code(403); exit('403 Forbidden'); }
 
 $userId = (int) $_SESSION['user_id'];
 $message = '';
 
+// Action: Handle profile updates when the form is submitted.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $newPassword = $_POST['new_password'] ?? '';
     try {
         if ($username !== '') {
+            // Action: Save the updated username in the users table.
             $stmt = $pdo->prepare(
                 'UPDATE users
                  SET username = :u
@@ -28,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         if ($newPassword !== '') {
             if (strlen($newPassword) >= 8) {
+                // Action: Hash and store the new password securely.
                 $stmt = $pdo->prepare('UPDATE users SET password_hash = :p WHERE id = :id');
                 $stmt->execute(['p' => password_hash($newPassword, PASSWORD_DEFAULT), 'id' => $userId]);
                 $message = 'Profile and password updated.';
@@ -55,6 +60,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 </div>
 <?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 <form method="POST" class="submit-form">
+<<<<<<< HEAD
 <div class="form-section">
     <h2>Account Information</h2>
     <div class="form-row">
@@ -82,6 +88,13 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
     <button type="submit" class="btn btn-primary">Save Profile</button>
     <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
 </div>
+=======
+<label>Username</label><input type="text" name="username" value="<?= esc((string)$user['username']) ?>" required>
+<label>Email (read-only)</label><input type="email" value="<?= esc((string)$user['email']) ?>" readonly>
+<label>New Password (optional)</label><input type="password" name="new_password" placeholder="At least 8 characters">
+<!-- Action: Submit profile changes for saving. -->
+<button type="submit">Save Profile</button>
+>>>>>>> e7daf47 (added comments)
 </form>
 </section></main></body></html>
 <script src="../assets/js/header.js"></script>
