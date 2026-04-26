@@ -4,6 +4,7 @@ app_session_start();
 require_once __DIR__ . '/includes/db.php';
 $activeNav = 'home';
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: auth/login.php', true, 302);
     exit;
@@ -35,6 +36,7 @@ $role = $_SESSION['role'] ?? 'user';
             <div class="feature-card">
                 <h3>Search Module</h3>
                 <p>Search declarations by year, party, and position.</p>
+                <!-- Action: Open the declarations search module. -->
                 <p><a href="modules/list.php">Open Search Module</a></p>
             </div>
 
@@ -42,6 +44,7 @@ $role = $_SESSION['role'] ?? 'user';
                 <div class="feature-card">
                     <h3>Submit Module</h3>
                     <p>Manage your profile and submissions.</p>
+                    <!-- Action: Open submit dashboard for politician users. -->
                     <p><a href="submit/dashboard.php">Open Submit Module</a></p>
                 </div>
             <?php endif; ?>
@@ -50,6 +53,7 @@ $role = $_SESSION['role'] ?? 'user';
                 <div class="feature-card">
                     <h3>Admin Module</h3>
                     <p>Manage users, submissions, configuration, and reports.</p>
+                    <!-- Action: Open admin dashboard for admin users. -->
                     <p><a href="admin/admin.php">Open Admin Module</a></p>
                 </div>
             <?php endif; ?>
@@ -57,6 +61,7 @@ $role = $_SESSION['role'] ?? 'user';
             <div class="feature-card">
                 <h3>API Module</h3>
                 <p>Access the integration endpoints for third-party systems.</p>
+                <!-- Action: Open API module index page. -->
                 <p><a href="api/index.php">Open API Module</a></p>
             </div>
 

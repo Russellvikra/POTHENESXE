@@ -3,6 +3,7 @@ require_once __DIR__ . '/../includes/db.php';
 
 $errors = [];
 
+// Action: Validate and create a new user account when form is submitted.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -30,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'Passwords do not match.';
     }
 
-    // If no errors, check email uniqueness and insert
+    // Action: If validation passes, check uniqueness and insert the new user.
     if (count($errors) === 0) {
         try {
             $stmt = $pdo->prepare('SELECT id FROM users WHERE email = :email');
@@ -39,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->fetch()) {
                 $errors[] = 'Email already registered.';
             } else {
-                // Insert user
+                // Action: Save the new user with a hashed password.
                 $passwordHash = password_hash($password, PASSWORD_DEFAULT);
                 $insertStmt = $pdo->prepare(
                     'INSERT INTO users (username, email, password_hash, role) 
@@ -52,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'role' => 'user'
                 ]);
 
+                // Action: Redirect to login with a registration success flag.
                 header('Location: login.php?registered=1', true, 302);
                 exit;
             }
@@ -104,6 +106,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" id="confirm_password" name="confirm_password" required>
             </div>
 
+            <!-- Action: Submit registration form to create a new account. -->
             <button type="submit">Register</button>
         </form>
 

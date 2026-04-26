@@ -12,6 +12,7 @@ if (isset($_SESSION['user_id'])) {
 $error = '';
 $registered = isset($_GET['registered']) && $_GET['registered'] === '1';
 
+// Action: Process login credentials when the form is submitted.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = trim($_POST['email'] ?? '');
     $password = $_POST['password'] ?? '';
@@ -25,13 +26,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password_hash'])) {
-                // Login successful
+                // Action: Regenerate the session and store user identity after successful login.
                 session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
 
+                // Action: Redirect authenticated user to the home page.
                 header('Location: ../index.php', true, 302);
                 exit;
             } else {
@@ -78,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <input type="password" id="password" name="password" required>
             </div>
 
+            <!-- Action: Submit login form for authentication. -->
             <button type="submit">Login</button>
         </form>
 

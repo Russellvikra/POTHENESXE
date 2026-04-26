@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php', true, 302);
     exit;
@@ -34,7 +35,9 @@ $activeNav = 'dashboard';
                 </div>
             </div>
 
+            <!-- Action: Open declaration list page. -->
             <a href="list.php">View Declarations</a>
+            <!-- Action: Sign out current user and end session. -->
             <a href="../auth/logout.php" style="background: #c82c3b; margin-left: 10px;">Logout</a>
         </div>
     </div>

@@ -3,25 +3,32 @@ require_once __DIR__ . '/../includes/session.php';
 app_session_start();
 require_once __DIR__ . '/../includes/db.php';
 
+// Action: Redirect unauthenticated users to login.
 if (!isset($_SESSION['user_id'])) { header('Location: ../auth/login.php', true, 302); exit; }
+// Action: Restrict reports page access to admin users only.
 if (($_SESSION['role'] ?? '') !== 'admin') { http_response_code(403); exit('403 Forbidden'); }
 
+// Action: Load high-level declaration and asset totals.
 $summaryStmt = $pdo->prepare('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id');
 $summaryStmt->execute();
 $summary = $summaryStmt->fetch();
 
+// Action: Load submission counts grouped by declaration year.
 $byYearStmt = $pdo->prepare('SELECT d.year, COUNT(*) AS total FROM declarations d GROUP BY d.year ORDER BY d.year DESC');
 $byYearStmt->execute();
 $byYear = $byYearStmt->fetchAll();
 
+// Action: Load submission counts grouped by party.
 $byPartyStmt = $pdo->prepare('SELECT COALESCE(pa.name, "N/A") AS party, COUNT(DISTINCT d.id) AS total FROM declarations d INNER JOIN politicians p ON p.id = d.politician_id LEFT JOIN parties pa ON pa.id = p.party_id GROUP BY COALESCE(pa.name, "N/A") ORDER BY total DESC');
 $byPartyStmt->execute();
 $byParty = $byPartyStmt->fetchAll();
 
+// Action: Load asset category totals and counts.
 $assetTypesStmt = $pdo->prepare('SELECT type, COUNT(*) AS cnt, COALESCE(SUM(value),0) AS total_value FROM assets GROUP BY type ORDER BY total_value DESC');
 $assetTypesStmt->execute();
 $assetTypes = $assetTypesStmt->fetchAll();
 
+// Action: List politicians that have not submitted any declaration.
 $missingSubmissionsStmt = $pdo->prepare(
 	'SELECT u.username, u.email, p.position, COALESCE(pa.name, "N/A") AS party
 	 FROM politicians p
