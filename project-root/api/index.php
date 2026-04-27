@@ -1,56 +1,51 @@
 <?php
-require_once __DIR__ . '/../includes/session.php';
-app_session_start();
+require_once __DIR__ . '/_bootstrap.php';
 
-// Action: Set CORS headers so external systems can call this endpoint.
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+api_apply_common_headers(['GET']);
+api_require_auth();
 
-// Action: Respond to CORS preflight checks without processing API logic.
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
-	http_response_code(204);
-	exit;
-}
+$baseUrl = api_base_url('/api/index.php');
 
-// Action: Return unauthorized response when no authenticated session exists.
-if (!isset($_SESSION['user_id'])) {
-	http_response_code(401);
-	header('Content-Type: application/json; charset=UTF-8');
-	echo json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-	exit;
-}
-
-header('Content-Type: application/json; charset=UTF-8');
-
-$scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-$host = $_SERVER['HTTP_HOST'] ?? 'localhost';
-$baseDir = rtrim(str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? '/api/index.php')), '/');
-$baseUrl = $scheme . '://' . $host . $baseDir;
-
-// Action: Return API metadata and available endpoint definitions.
-echo json_encode([
+api_send_json([
 	'name' => 'Pothen Esxes API',
-	'version' => '1.0',
-	'description' => 'Endpoints for third-party systems to fetch declaration data.',
+	'version' => '2.0',
+	'description' => 'REST endpoints for declarations, parties, reviews, and session state.',
 	'endpoints' => [
 		[
 			'path' => '/api/declarations.php',
-			'method' => 'GET',
+			'methods' => ['GET', 'POST', 'PUT', 'DELETE'],
 			'url' => $baseUrl . '/declarations.php',
-			'description' => 'Fetch declarations with optional filters.',
-			'query_params' => [
-				'keyword' => 'Search by year, party, or position',
-				'status' => 'draft|submitted',
-				'year' => 'e.g. 2025',
-				'order' => 'newest|oldest',
-			],
+			'description' => 'Full CRUD for declarations. Supports filters and optional asset rows.',
+		],
+		[
+			'path' => '/api/parties.php',
+			'methods' => ['GET', 'POST', 'PUT', 'DELETE'],
+			'url' => $baseUrl . '/parties.php',
+			'description' => 'Full CRUD for parties (admin required for write actions).',
+		],
+		[
+			'path' => '/api/reviews.php',
+			'methods' => ['GET', 'POST'],
+			'url' => $baseUrl . '/reviews.php',
+			'description' => 'List or create declaration reviews (admin for create).',
 		],
 		[
 			'path' => '/api/stats.php',
-			'method' => 'GET',
+			'methods' => ['GET'],
 			'url' => $baseUrl . '/stats.php',
 			'description' => 'Administrative statistics endpoint (admin session required).',
 		],
+		[
+			'path' => '/api/auth_status.php',
+			'methods' => ['GET'],
+			'url' => $baseUrl . '/auth_status.php',
+			'description' => 'Returns current authentication/session state.',
+		],
+		[
+			'path' => '/api/index.php',
+			'methods' => ['GET'],
+			'url' => $baseUrl . '/index.php',
+			'description' => 'API metadata and endpoint directory.',
+		],
 	],
-], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+]);

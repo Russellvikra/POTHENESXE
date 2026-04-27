@@ -42,3 +42,24 @@ CREATE TABLE assets (
     value DECIMAL(12,2) NOT NULL,
     FOREIGN KEY (declaration_id) REFERENCES declarations(id) ON DELETE CASCADE
 );
+
+CREATE TABLE declaration_reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    declaration_id INT NOT NULL,
+    reviewer_id INT DEFAULT NULL,
+    review_note TEXT NOT NULL,
+    review_status ENUM('approved', 'needs_changes', 'rejected') NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (declaration_id) REFERENCES declarations(id) ON DELETE CASCADE,
+    FOREIGN KEY (reviewer_id) REFERENCES users(id) ON DELETE SET NULL
+);
+
+CREATE TABLE login_audit (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT DEFAULT NULL,
+    email VARCHAR(100) DEFAULT NULL,
+    login_status ENUM('success', 'failed') NOT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
+);

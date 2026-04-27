@@ -1,35 +1,9 @@
 <?php
-require_once __DIR__ . '/../includes/session.php';
-app_session_start();
-// Action: Set CORS headers so external systems can call this endpoint.
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+require_once __DIR__ . '/_bootstrap.php';
 
-// Action: Respond to CORS preflight checks without running report queries.
-if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'OPTIONS') {
-    http_response_code(204);
-    exit;
-}
-
-// Action: Return unauthorized response when session is missing.
-if (!isset($_SESSION['user_id'])) {
-    http_response_code(401);
-    header('Content-Type: application/json; charset=UTF-8');
-    echo json_encode(['error' => 'Unauthorized'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    exit;
-}
-
-// Action: Restrict this endpoint to admin users only.
-if (($_SESSION['role'] ?? '') !== 'admin') {
-    http_response_code(403);
-    header('Content-Type: application/json; charset=UTF-8');
-    echo json_encode(['error' => 'Forbidden'], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-    exit;
-}
-
-require_once __DIR__ . '/../includes/db.php';
-header('Content-Type: application/json; charset=UTF-8');
+api_apply_common_headers(['GET']);
+api_require_auth();
+api_require_role('admin');
 
 // Action: Query high-level declaration and asset totals.
 $summaryStmt = $pdo->prepare('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id');
@@ -52,9 +26,9 @@ $assetTypesStmt->execute();
 $assetTypes = $assetTypesStmt->fetchAll();
 
 // Action: Return statistics payload as JSON.
-echo json_encode([
+api_send_json([
     'summary' => $summary,
     'by_year' => $byYear,
     'by_party' => $byParty,
     'asset_types' => $assetTypes,
-], JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+]);
