@@ -37,12 +37,16 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Public Statistics</title>
+    <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
-<main class="page-wrap">
+    <?php include '../assets/include/header.html'; ?>
+    <main class="page-wrap">
     <section class="card"><h1>Statistics</h1></section>
     <section class="card"><h2>By Year</h2><div class="table-wrap"><table><thead><tr><th>Year</th><th>Total</th></tr></thead><tbody><?php foreach ($byYear as $r): ?><tr><td><?= esc((string)$r['year']) ?></td><td><?= (int)$r['total'] ?></td></tr><?php endforeach; ?></tbody></table></div></section>
     <section class="card"><h2>By Party</h2><div class="table-wrap"><table><thead><tr><th>Party</th><th>Total</th></tr></thead><tbody><?php foreach ($byParty as $r): ?><tr><td><?= esc((string)$r['party']) ?></td><td><?= (int)$r['total'] ?></td></tr><?php endforeach; ?></tbody></table></div></section>

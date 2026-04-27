@@ -15,16 +15,19 @@ $declarationId = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT, [
 ]);
 
 $declaration = null;
+$assets = [];
 $recentDeclarations = [];
 $errorMessage = '';
 
 // Action: If an ID is provided, load that declaration; otherwise load recent declarations.
 if ($declarationId) {
     $statement = $pdo->prepare(
-        'SELECT d.id, d.year, d.status, d.created_at,
+        'SELECT d.id, d.user_id, d.year, d.status, d.created_at, d.title, d.details,
+                u.username,
                 p.position,
                 pa.name AS party_name
          FROM declarations d
+         INNER JOIN users u ON u.id = d.user_id
          INNER JOIN politicians p ON p.id = d.politician_id
          LEFT JOIN parties pa ON pa.id = p.party_id
          WHERE d.id = :declaration_id'
@@ -35,6 +38,13 @@ if ($declarationId) {
 
     if (!$declaration) {
         $errorMessage = 'Declaration was not found.';
+    } else {
+        // Action: Load all assets for this declaration
+        $assetsStatement = $pdo->prepare(
+            'SELECT id, type, description, value FROM assets WHERE declaration_id = :declaration_id ORDER BY id ASC'
+        );
+        $assetsStatement->execute(['declaration_id' => $declarationId]);
+        $assets = $assetsStatement->fetchAll();
     }
 } else {
     $recentStatement = $pdo->prepare(
@@ -88,6 +98,10 @@ function esc(string $value): string
                     <p class="meta-value">#<?= (int) $declaration['id'] ?></p>
                 </div>
                 <div>
+                    <p class="meta-label">Submitted By</p>
+                    <p class="meta-value"><?= esc((string) ($declaration['username'] ?? 'N/A')) ?></p>
+                </div>
+                <div>
                     <p class="meta-label">Party</p>
                     <p class="meta-value"><?= esc($declaration['party_name'] ?? 'N/A') ?></p>
                 </div>
@@ -103,14 +117,48 @@ function esc(string $value): string
                     <p class="meta-label">Status</p>
                     <p class="meta-value status-pill status-<?= esc((string) $declaration['status']) ?>"><?= esc((string) $declaration['status']) ?></p>
                 </div>
+                <div>
+                    <p class="meta-label">Submitted On</p>
+                    <p class="meta-value"><?= esc((string) $declaration['created_at']) ?></p>
+                </div>
             </section>
 
             <section class="card">
                 <div class="card-title-row">
-                    <h2>Declaration Details</h2>
-                    <p class="muted">Created: <?= esc((string) $declaration['created_at']) ?></p>
+                    <h2>Assets</h2>
                 </div>
-                <p class="muted">Detailed asset records are restricted to authenticated users.</p>
+                <?php if (count($assets) === 0): ?>
+                    <p class="muted">No assets recorded for this declaration.</p>
+                <?php else: ?>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Value (EUR)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php 
+                                $totalValue = 0;
+                                foreach ($assets as $asset): 
+                                    $totalValue += (float) $asset['value'];
+                                ?>
+                                    <tr>
+                                        <td><?= esc((string) $asset['type']) ?></td>
+                                        <td><?= esc((string) $asset['description']) ?></td>
+                                        <td><?= number_format((float) $asset['value'], 2) ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                                <tr style="font-weight: bold; border-top: 2px solid #ddd;">
+                                    <td colspan="2">Total Assets Value</td>
+                                    <td><?= number_format($totalValue, 2) ?></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                <?php endif; ?>
             </section>
         <?php else: ?>
             <section class="card">

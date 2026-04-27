@@ -22,6 +22,11 @@ $successId = filter_input(INPUT_GET, 'success_id', FILTER_VALIDATE_INT, [
     'options' => ['min_range' => 1],
 ]);
 
+// Action: Fetch available asset types from the database
+$assetTypesStmt = $pdo->prepare('SELECT DISTINCT type FROM assets ORDER BY type ASC');
+$assetTypesStmt->execute();
+$availableAssetTypes = $assetTypesStmt->fetchAll(PDO::FETCH_COLUMN);
+
 // Action: Run the declaration save workflow after form submission.
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $year = filter_input(INPUT_POST, 'year', FILTER_VALIDATE_INT, [
@@ -213,19 +218,28 @@ function esc(string $value): string
                     <span class="asset-value">Value (EUR)</span>
                 </div>
 
+                <div id="assets-container">
                 <?php
-                $postedTypes = $_POST['asset_type'] ?? ['', '', ''];
-                $postedDescriptions = $_POST['asset_description'] ?? ['', '', ''];
-                $postedValues = $_POST['asset_value'] ?? ['', '', ''];
-                $rows = max(count($postedTypes), 3);
+                $postedTypes = $_POST['asset_type'] ?? [''];
+                $postedDescriptions = $_POST['asset_description'] ?? [''];
+                $postedValues = $_POST['asset_value'] ?? [''];
+                $rows = max(count($postedTypes), 1);
                 for ($i = 0; $i < $rows; $i++):
                 ?>
                     <div class="asset-row">
-                        <input type="text" name="asset_type[]" value="<?= esc((string) ($postedTypes[$i] ?? '')) ?>" placeholder="e.g., house, car, bank account">
+                        <select name="asset_type[]" required>
+                            <option value="">Select Type</option>
+                            <?php foreach ($availableAssetTypes as $assetType): ?>
+                                <option value="<?= esc($assetType) ?>" <?= (($postedTypes[$i] ?? '') === $assetType) ? 'selected' : '' ?>><?= esc($assetType) ?></option>
+                            <?php endforeach; ?>
+                        </select>
                         <input type="text" name="asset_description[]" value="<?= esc((string) ($postedDescriptions[$i] ?? '')) ?>" placeholder="Details about the asset">
                         <input type="number" name="asset_value[]" value="<?= esc((string) ($postedValues[$i] ?? '')) ?>" min="0" step="0.01" placeholder="0.00">
                     </div>
                 <?php endfor; ?>
+                </div>
+
+                <button type="button" id="add-asset-btn" class="btn btn-secondary" style="margin-top: 10px;">+ Add Another Asset</button>
             </div>
 
             <div class="form-actions">
@@ -262,5 +276,43 @@ function esc(string $value): string
     </div>
 </footer>
 <script src="../assets/js/header.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addAssetBtn = document.getElementById('add-asset-btn');
+    const assetsContainer = document.getElementById('assets-container');
+    const assetTypesOptions = <?php echo json_encode($availableAssetTypes); ?>;
+
+    addAssetBtn.addEventListener('click', function() {
+        const newRow = document.createElement('div');
+        newRow.className = 'asset-row';
+        
+        let optionsHtml = '<option value="">Select Type</option>';
+        assetTypesOptions.forEach(type => {
+            optionsHtml += '<option value="' + escapeHtml(type) + '">' + escapeHtml(type) + '</option>';
+        });
+        
+        newRow.innerHTML = `
+            <select name="asset_type[]" required>
+                ${optionsHtml}
+            </select>
+            <input type="text" name="asset_description[]" placeholder="Details about the asset">
+            <input type="number" name="asset_value[]" min="0" step="0.01" placeholder="0.00">
+        `;
+        
+        assetsContainer.appendChild(newRow);
+    });
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+    }
+});
+</script>
 </body>
 </html>

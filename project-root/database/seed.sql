@@ -4,7 +4,7 @@ INSERT INTO parties (name) VALUES
 INSERT INTO users (username, email, password_hash, role) VALUES
 ('admin', 'admin@test.com', '$2y$10$kt0jxSzjIohenPym15V7a.4wqF2iaQnnZOmX7sJM17NFQbk.oixBa', 'admin'),
 ('nikos', 'nikos@test.com', '$2y$10$kt0jxSzjIohenPym15V7a.4wqF2iaQnnZOmX7sJM17NFQbk.oixBa', 'politician'),
-('maria', 'maria@test.com', '$2y$10$kt0jxSzjIohenPym15V7a.4wqF2iaQnnX7sJM17NFQbk.oixBa', 'politician');
+('maria', 'maria@test.com', '$2y$10$kt0jxSzjIohenPym15V7a.4wqF2iaQnnZOmX7sJM17NFQbk.oixBa', 'politician');
 
 INSERT INTO politicians (user_id, party_id, position) VALUES
 (1, NULL, 'Administrator'),

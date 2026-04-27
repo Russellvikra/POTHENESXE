@@ -14,6 +14,7 @@ $activeNav = 'submit';
     <title>Submit Dashboard</title>
     <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/submit.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
 <?php include '../assets/include/header.html'; ?>
@@ -46,6 +47,7 @@ $activeNav = 'submit';
         </div>
     </section>
 </main>
+<?php include '../assets/include/footer.html'; ?>
 <script src="../assets/js/header.js"></script>
 </body>
 </html>

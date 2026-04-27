@@ -131,9 +131,12 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Users</title>
+    <link rel="stylesheet" href="../assets/css/header.css">
     <link rel="stylesheet" href="../assets/css/admin.css">
+    <link rel="stylesheet" href="../assets/css/footer.css">
 </head>
 <body>
+<?php include '../assets/include/header.html'; ?>
 <main class="page-wrap">
     <section class="card">
         <div class="card-header">
@@ -232,6 +235,7 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
         </div>
     </section>
 </main>
+<?php include '../assets/include/footer.html'; ?>
 <script src="../assets/js/header.js"></script>
 </body>
 </html>
