@@ -12,25 +12,35 @@ $activeNav = 'search';
 $keyword = trim($_GET['keyword'] ?? '');
 
 $declarations = [];
-$searchPerformed = $keyword !== '';
 
-// Action: Run declaration search when a keyword is provided.
-if ($searchPerformed) {
-    try {
+// Action: Load all declarations or filtered results based on keyword.
+try {
+    if ($keyword !== '') {
+        // Action: Run declaration search when a keyword is provided.
         $stmt = $pdo->prepare(
             'SELECT d.id, d.title, d.details, d.year, d.created_at, u.username
              FROM declarations d
              INNER JOIN users u ON u.id = d.user_id
              WHERE d.title LIKE :kw OR d.details LIKE :kw OR CAST(d.year AS CHAR) LIKE :kw OR u.username LIKE :kw
-             ORDER BY d.created_at DESC, d.id DESC'
+             ORDER BY d.created_at ASC, d.id ASC'
         );
 
         $keywordParam = '%' . $keyword . '%';
         $stmt->execute(['kw' => $keywordParam]);
         $declarations = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        $declarations = [];
+    } else {
+        // Action: Load all declarations on initial page load.
+        $stmt = $pdo->prepare(
+            'SELECT d.id, d.title, d.details, d.year, d.created_at, u.username
+             FROM declarations d
+             INNER JOIN users u ON u.id = d.user_id
+             ORDER BY d.created_at ASC, d.id ASC'
+        );
+        $stmt->execute();
+        $declarations = $stmt->fetchAll();
     }
+} catch (PDOException $e) {
+    $declarations = [];
 }
 ?>
 <!DOCTYPE html>
@@ -60,45 +70,39 @@ if ($searchPerformed) {
                 <?php endif; ?>
             </form>
 
-            <?php if ($searchPerformed): ?>
-                <?php if (count($declarations) === 0): ?>
-                    <div class="no-results">
-                        <p>No declarations found for <strong><?= htmlspecialchars($keyword) ?></strong></p>
-                    </div>
-                <?php else: ?>
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>User</th>
-                                <th>Title</th>
-                                <th>Year</th>
-                                <th>Details</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($declarations as $decl): ?>
-                                <tr>
-                                    <!-- Action: Open details page for this declaration record. -->
-                                    <td><a href="../modules/declaration.php?id=<?= (int) $decl['id'] ?>">#<?= (int) $decl['id'] ?></a></td>
-                                    <td><?= htmlspecialchars($decl['username'] ?? 'N/A') ?></td>
-                                    <td><?= htmlspecialchars($decl['title'] ?? 'N/A') ?></td>
-                                    <td><?= htmlspecialchars((string) $decl['year']) ?></td>
-                                    <td><?= htmlspecialchars((string) $decl['details']) ?></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                    </div>
-                    <p class="meta" style="margin-top: 16px;">
-                        Found <?= count($declarations) ?> declaration<?= count($declarations) !== 1 ? 's' : '' ?>.
-                    </p>
-                <?php endif; ?>
-            <?php else: ?>
+            <?php if (count($declarations) === 0): ?>
                 <div class="no-results">
-                    <p>Enter a keyword to search declarations.</p>
+                    <p><?= $keyword !== '' ? 'No declarations found for <strong>' . htmlspecialchars($keyword) . '</strong>' : 'No declarations available.' ?></p>
                 </div>
+            <?php else: ?>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User</th>
+                            <th>Title</th>
+                            <th>Year</th>
+                            <th>Details</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($declarations as $decl): ?>
+                            <tr>
+                                <!-- Action: Open details page for this declaration record. -->
+                                <td><a href="../modules/declaration.php?id=<?= (int) $decl['id'] ?>">#<?= (int) $decl['id'] ?></a></td>
+                                <td><?= htmlspecialchars($decl['username'] ?? 'N/A') ?></td>
+                                <td><?= htmlspecialchars($decl['title'] ?? 'N/A') ?></td>
+                                <td><?= htmlspecialchars((string) $decl['year']) ?></td>
+                                <td><?= htmlspecialchars((string) $decl['details']) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+                </div>
+                <p class="meta" style="margin-top: 16px;">
+                    Found <?= count($declarations) ?> declaration<?= count($declarations) !== 1 ? 's' : '' ?>.
+                </p>
             <?php endif; ?>
         </div>
     </div>
