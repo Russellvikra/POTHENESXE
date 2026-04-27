@@ -2,9 +2,27 @@
 require_once __DIR__ . '/_bootstrap.php';
 
 api_apply_common_headers(['GET', 'POST']);
-api_require_auth();
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+
+function resolve_reviewer_id(PDO $pdo, int $requestedReviewerId): int
+{
+    if ($requestedReviewerId > 0) {
+        $check = $pdo->prepare('SELECT id FROM users WHERE id = :id LIMIT 1');
+        $check->execute(['id' => $requestedReviewerId]);
+        if ($check->fetchColumn()) {
+            return $requestedReviewerId;
+        }
+    }
+
+    $fallback = $pdo->prepare('SELECT id FROM users ORDER BY id ASC LIMIT 1');
+    $fallback->execute();
+    $id = $fallback->fetchColumn();
+    if ($id === false) {
+        api_send_json(['error' => 'No users available to assign review ownership'], 500);
+    }
+    return (int) $id;
+}
 
 if ($method === 'GET') {
     $declarationId = filter_input(INPUT_GET, 'declaration_id', FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
@@ -25,7 +43,6 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    api_require_role('admin');
     $payload = api_request_data();
 
     $declarationId = isset($payload['declaration_id']) ? (int) $payload['declaration_id'] : 0;
@@ -50,9 +67,10 @@ if ($method === 'POST') {
         'INSERT INTO declaration_reviews (declaration_id, reviewer_id, review_note, review_status)
          VALUES (:declaration_id, :reviewer_id, :review_note, :review_status)'
     );
+    $reviewerId = resolve_reviewer_id($pdo, isset($payload['reviewer_id']) ? (int) $payload['reviewer_id'] : 0);
     $stmt->execute([
         'declaration_id' => $declarationId,
-        'reviewer_id' => (int) $_SESSION['user_id'],
+        'reviewer_id' => $reviewerId,
         'review_note' => $reviewNote,
         'review_status' => $reviewStatus,
     ]);

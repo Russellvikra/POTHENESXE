@@ -1,74 +1,135 @@
 <?php
 require_once __DIR__ . '/includes/session.php';
 app_session_start();
-require_once __DIR__ . '/includes/db.php';
-$activeNav = 'home';
 
-// Action: Redirect unauthenticated users to login.
-if (!isset($_SESSION['user_id'])) {
-    header('Location: auth/login.php', true, 302);
+if (isset($_SESSION['user_id'])) {
+    $role = (string) ($_SESSION['role'] ?? 'user');
+    if ($role === 'admin') {
+        header('Location: admin/admin.php', true, 302);
+        exit;
+    }
+    if ($role === 'politician') {
+        header('Location: submit/dashboard.php', true, 302);
+        exit;
+    }
+    header('Location: modules/list.php', true, 302);
     exit;
 }
-
-$role = $_SESSION['role'] ?? 'user';
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pothen Esxes - Home</title>
-    <link rel="stylesheet" href="./assets/css/header.css">
-    <link rel="stylesheet" href="./assets/css/footer.css">
-    <link rel="stylesheet" href="./assets/css/home.css">
+    <title>Pothen Esxes - Public Home</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: #102040;
+            background: linear-gradient(180deg, #f3f7fc 0%, #e8eff7 100%);
+        }
+
+        .page {
+            width: min(1000px, calc(100% - 28px));
+            margin: 40px auto;
+            display: grid;
+            gap: 18px;
+        }
+
+        .hero,
+        .card {
+            background: #fff;
+            border: 1px solid #dbe6f2;
+            border-radius: 18px;
+            padding: 26px;
+            box-shadow: 0 14px 30px rgba(20, 38, 70, 0.08);
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            font-size: clamp(30px, 5vw, 46px);
+            color: #16335f;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: #4f6685;
+            line-height: 1.7;
+            font-size: 16px;
+        }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+        }
+
+        .card h2 {
+            margin: 0 0 8px;
+            font-size: 22px;
+        }
+
+        .card p {
+            margin: 0 0 14px;
+            color: #526b8b;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 11px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background: #0c3f91;
+            color: #fff;
+            box-shadow: 0 10px 18px rgba(12, 63, 145, 0.15);
+        }
+
+        .btn-secondary {
+            background: #eef4ff;
+            color: #1d4074;
+            border: 1px solid #cbdafb;
+        }
+    </style>
 </head>
 <body>
-    <?php include './assets/include/header.html'; ?>
-
-    <main>
-        <div class="hero">
+    <main class="page">
+        <section class="hero">
             <h1>Πόθεν Έσχες</h1>
-            <p class="subtitle">Financial Declaration Monitoring System</p>
-            <p>Choose one of your available modules below.</p>
-        </div>
+            <p class="subtitle">
+                Pothen Esxes is a financial declaration monitoring system for public officials in Cyprus.
+                Use the public API module directly, or log in to continue to the user and admin dashboards.
+            </p>
+        </section>
 
-        <div class="features">
-            <div class="feature-card">
-                <h3>Search Module</h3>
-                <p>Search declarations by year, party, and position.</p>
-                <!-- Action: Open the declarations search module. -->
-                <p><a href="modules/list.php">Open Search Module</a></p>
-            </div>
+        <section class="actions">
+            <article class="card">
+                <h2>Login</h2>
+                <p>Sign in to access user or admin pages based on your role.</p>
+                <a class="btn btn-primary" href="auth/login.php">Go to Login</a>
+            </article>
 
-            <?php if ($role === 'politician'): ?>
-                <div class="feature-card">
-                    <h3>Submit Module</h3>
-                    <p>Manage your profile and submissions.</p>
-                    <!-- Action: Open submit dashboard for politician users. -->
-                    <p><a href="submit/dashboard.php">Open Submit Module</a></p>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($role === 'admin'): ?>
-                <div class="feature-card">
-                    <h3>Admin Module</h3>
-                    <p>Manage users, submissions, configuration, and reports.</p>
-                    <!-- Action: Open admin dashboard for admin users. -->
-                    <p><a href="admin/admin.php">Open Admin Module</a></p>
-                </div>
-            <?php endif; ?>
-
-            <div class="feature-card">
-                <h3>API Module</h3>
-                <p>Access the integration endpoints for third-party systems.</p>
-                <!-- Action: Open API module index page. -->
-                <p><a href="api/index.php">Open API Module</a></p>
-            </div>
-
-        </div>
+            <article class="card">
+                <h2>API Module</h2>
+                <p>Open the API module directly. Public access is enabled.</p>
+                <a class="btn btn-secondary" href="api/index.php">Open API Module</a>
+            </article>
+        </section>
     </main>
-
-    <?php include './assets/include/footer.html'; ?>
-    <script src="./assets/js/header.js"></script>
 </body>
 </html>
