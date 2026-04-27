@@ -60,8 +60,13 @@ project-root/
     manage_users.php
     reports.php
   api/
+    _bootstrap.php
+    auth_status.php
     declarations.php
     index.php
+    parties.php
+    postman_collection.json
+    reviews.php
     stats.php
   assets/
     css/
@@ -115,6 +120,18 @@ README.md
    - `project-root/database/seed.sql`
 4. Verify `project-root/includes/db.php` uses the same database credentials.
 
+## Database Model (7 Tables + Relations)
+
+The project uses 7 relational tables:
+
+- `users`
+- `parties`
+- `politicians` (FK to `users`, FK to `parties`)
+- `declarations` (FK to `users`, FK to `politicians`)
+- `assets` (FK to `declarations`)
+- `declaration_reviews` (FK to `declarations`, FK to `users`)
+- `login_audit` (FK to `users`)
+
 ## How to Run the Project
 
 1. Install and start Apache + MySQL (XAMPP/LAMPP/LAMP).
@@ -148,7 +165,30 @@ README.md
 - Declaration listing and detailed declaration pages
 - Search and statistics modules
 - Admin pages for configuration, users, submissions, and reports
-- API endpoints for declarations and statistics (authenticated access)
+- Session-based role handling with `admin`, `politician`, and `user`
+
+## API Endpoints (6 Total)
+
+- `GET /api/index.php` - API directory
+- `GET /api/auth_status.php` - current session/auth state
+- `GET|POST|PUT|DELETE /api/declarations.php` - full CRUD for declarations
+- `GET|POST|PUT|DELETE /api/parties.php` - full CRUD for parties (admin write)
+- `GET|POST /api/reviews.php` - declaration review flow
+- `GET /api/stats.php` - administrative reports
+
+### Postman Demo
+
+- Import collection: `project-root/api/postman_collection.json`
+- Set variable `baseUrl` to your local API root (default included in file)
+- Use browser/session login first, then run the requests in Postman
+
+## CRUD Coverage Summary
+
+- Users: full CRUD from admin panel (`admin/manage_users.php`)
+- Declarations: full CRUD from API (`api/declarations.php`)
+- Parties: full CRUD from API (`api/parties.php`) and add/update from admin UI (`admin/configure.php`)
+- Assets: create/update/delete through declaration create/update/delete API flow
+- Politician profiles: create/update/read through admin configuration and declaration submission workflows
 
 ## Repository
 
@@ -160,3 +200,12 @@ GitHub: https://github.com/Russellvikra/POTHENESXE
 - README with names and AM numbers
 - README with work distribution per student/file
 - README with LAMP setup steps and DB import instructions
+
+## Checklist Status
+
+- ✅ Functional MySQL database with 6-7 tables and relations (implemented: 7 tables)
+- ✅ Full CRUD on core entities (users, declarations, parties)
+- ✅ API endpoints (implemented: 6) and Postman demo collection included
+- ✅ Login/session handling with at least 2 roles (implemented: 3 roles)
+- ✅ Clean and responsive UI (existing CSS/UI structure preserved)
+- ✅ GitHub repository with member commits and complete README

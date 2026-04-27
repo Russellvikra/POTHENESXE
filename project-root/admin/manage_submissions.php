@@ -59,7 +59,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Manage Submissions</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body>
 <main class="page-wrap">
-<<<<<<< HEAD
 <section class="card">
 <div class="card-header">
     <h1>Manage Submissions</h1>
@@ -104,20 +103,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
     </tr>
     <?php endforeach; ?>
 <?php endif; ?>
-=======
-<section class="card"><h1>Manage Submissions</h1><?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
-<!-- Action: Apply list filters for submission status and sorting. -->
-<form method="GET" class="filter-form">
-<select name="status"><option value="">All status</option><option value="draft" <?= $status === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $status === 'submitted' ? 'selected' : '' ?>>Submitted</option></select>
-<select name="order"><option value="newest" <?= $order === 'newest' ? 'selected' : '' ?>>Newest</option><option value="oldest" <?= $order === 'oldest' ? 'selected' : '' ?>>Oldest</option></select>
-<button type="submit">Apply</button></form></section>
-<section class="card"><div class="table-wrap"><table><thead><tr><th>ID</th><th>User</th><th>Year</th><th>Status</th><th>Total</th><th>Created</th><th>Action</th></tr></thead><tbody>
-<?php foreach ($rows as $row): ?><tr>
-<td><a href="../modules/declaration.php?id=<?= (int)$row['id'] ?>">#<?= (int)$row['id'] ?></a></td>
-<td><?= esc((string)$row['username']) ?></td><td><?= esc((string)$row['year']) ?></td><td><?= esc((string)$row['status']) ?></td><td>EUR <?= number_format((float)$row['total'],2) ?></td><td><?= esc((string)$row['created_at']) ?></td>
-<td><form method="POST" class="inline-form"><input type="hidden" name="id" value="<?= (int)$row['id'] ?>"><select name="status"><option value="draft" <?= $row['status'] === 'draft' ? 'selected' : '' ?>>Draft</option><option value="submitted" <?= $row['status'] === 'submitted' ? 'selected' : '' ?>>Submitted</option></select><!-- Action: Save status change for this declaration. --><button type="submit">Save</button></form></td>
-</tr><?php endforeach; ?>
->>>>>>> e7daf47 (added comments)
 </tbody></table></div></section></main>
 <script src="../assets/js/header.js"></script>
 </body></html>

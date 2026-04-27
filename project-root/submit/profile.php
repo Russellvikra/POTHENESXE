@@ -60,7 +60,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
 </div>
 <?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 <form method="POST" class="submit-form">
-<<<<<<< HEAD
 <div class="form-section">
     <h2>Account Information</h2>
     <div class="form-row">
@@ -88,13 +87,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
     <button type="submit" class="btn btn-primary">Save Profile</button>
     <a href="dashboard.php" class="btn btn-secondary">Cancel</a>
 </div>
-=======
-<label>Username</label><input type="text" name="username" value="<?= esc((string)$user['username']) ?>" required>
-<label>Email (read-only)</label><input type="email" value="<?= esc((string)$user['email']) ?>" readonly>
-<label>New Password (optional)</label><input type="password" name="new_password" placeholder="At least 8 characters">
-<!-- Action: Submit profile changes for saving. -->
-<button type="submit">Save Profile</button>
->>>>>>> e7daf47 (added comments)
 </form>
 </section></main></body></html>
 <script src="../assets/js/header.js"></script>

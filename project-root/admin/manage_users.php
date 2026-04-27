@@ -142,7 +142,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
         </div>
         <?php if ($message !== ''): ?><div class="alert alert-success"><?= esc($message) ?></div><?php endif; ?>
 
-<<<<<<< HEAD
         <div class="form-section">
             <h2>➕ Add New User</h2>
             <form method="POST" class="form-grid">
@@ -174,22 +173,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                 <button type="submit" class="btn btn-primary">Add User</button>
             </form>
         </div>
-=======
-        <h2>Add User</h2>
-        <!-- Action: Submit form to create a new user account. -->
-        <form method="POST" class="filter-form">
-            <input type="hidden" name="action" value="add">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="email" name="email" placeholder="Email" required>
-            <select name="role">
-                <option value="user">User</option>
-                <option value="politician">Politician</option>
-                <option value="admin">Admin</option>
-            </select>
-            <input type="password" name="password" placeholder="Password (min 8)" required>
-            <button type="submit">Add</button>
-        </form>
->>>>>>> e7daf47 (added comments)
     </section>
 
     <section class="card">
@@ -218,7 +201,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                         <td><span class="role-badge role-<?= strtolower(esc((string) $user['role'])) ?>"><?= esc((string) $user['role']) ?></span></td>
                         <td><small class="text-muted"><?= esc((string) $user['created_at']) ?></small></td>
                         <td>
-<<<<<<< HEAD
                             <div class="action-buttons">
                                 <form method="POST" class="inline-form">
                                     <input type="hidden" name="action" value="update">
@@ -241,28 +223,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
                                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Remove user?')">✕ Delete</button>
                                 </form>
                             </div>
-=======
-                            <!-- Action: Submit form to update an existing user. -->
-                            <form method="POST" class="inline-form" style="margin-bottom:6px;">
-                                <input type="hidden" name="action" value="update">
-                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
-                                <input type="text" name="username" value="<?= esc((string) $user['username']) ?>" required>
-                                <input type="email" name="email" value="<?= esc((string) $user['email']) ?>" required>
-                                <input type="password" name="new_password" placeholder="New password (optional)">
-                                <select name="role">
-                                    <option value="user" <?= $user['role'] === 'user' ? 'selected' : '' ?>>User</option>
-                                    <option value="politician" <?= $user['role'] === 'politician' ? 'selected' : '' ?>>Politician</option>
-                                    <option value="admin" <?= $user['role'] === 'admin' ? 'selected' : '' ?>>Admin</option>
-                                </select>
-                                <button type="submit">Update</button>
-                            </form>
-                            <!-- Action: Submit form to remove this user account. -->
-                            <form method="POST" class="inline-form">
-                                <input type="hidden" name="action" value="remove">
-                                <input type="hidden" name="id" value="<?= (int) $user['id'] ?>">
-                                <button type="submit">Remove</button>
-                            </form>
->>>>>>> e7daf47 (added comments)
                         </td>
                     </tr>
                     <?php endforeach; ?>

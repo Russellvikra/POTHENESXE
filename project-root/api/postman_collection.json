@@ -1,0 +1,126 @@
+{
+  "info": {
+    "name": "POTHENESXE API Demo",
+    "description": "Demo collection for the required API checklist. Uses session authentication from your logged-in browser/PHP session.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth Status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auth_status.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["auth_status.php"]
+        }
+      }
+    },
+    {
+      "name": "List Declarations (GET)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/declarations.php?order=newest",
+          "host": ["{{baseUrl}}"],
+          "path": ["declarations.php"],
+          "query": [
+            { "key": "order", "value": "newest" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Create Declaration (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Demo API Declaration\",\n  \"details\": \"Created via Postman demo\",\n  \"year\": 2026,\n  \"status\": \"draft\",\n  \"assets\": [\n    {\n      \"type\": \"deposit\",\n      \"description\": \"Savings account\",\n      \"value\": 12500\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/declarations.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["declarations.php"]
+        }
+      }
+    },
+    {
+      "name": "Update Declaration (PUT)",
+      "request": {
+        "method": "PUT",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1,\n  \"title\": \"Updated title from Postman\",\n  \"status\": \"submitted\",\n  \"assets\": [\n    {\n      \"type\": \"car\",\n      \"description\": \"Updated car asset\",\n      \"value\": 22000\n    }\n  ]\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/declarations.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["declarations.php"]
+        }
+      }
+    },
+    {
+      "name": "Delete Declaration (DELETE)",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": 1\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/declarations.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["declarations.php"]
+        }
+      }
+    },
+    {
+      "name": "Parties CRUD Example (POST)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Demo Party via API\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/parties.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["parties.php"]
+        }
+      }
+    },
+    {
+      "name": "Admin Stats",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/stats.php",
+          "host": ["{{baseUrl}}"],
+          "path": ["stats.php"]
+        }
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost/POTHENESXE/project-root/api"
+    }
+  ]
+}

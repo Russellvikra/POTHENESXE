@@ -64,7 +64,6 @@ $politicians = $politiciansStmt->fetchAll();
 function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8'); }
 ?>
 <!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Configure System</title><link rel="stylesheet" href="../assets/css/admin.css"></head><body>
-<<<<<<< HEAD
 <main class="page-wrap">
 <section class="card">
 <div class="card-header">
@@ -99,13 +98,6 @@ function esc(string $v): string { return htmlspecialchars($v, ENT_QUOTES, 'UTF-8
     </tr>
     <?php endforeach; ?>
 <?php endif; ?>
-=======
-<main class="page-wrap"><section class="card"><h1>Configure System</h1><?php if ($message !== ''): ?><div class="notice"><?= esc($message) ?></div><?php endif; ?>
-<h2>Parties</h2><!-- Action: Submit form to add a new political party. --><form method="POST" class="filter-form"><input type="hidden" name="action" value="add_party"><input type="text" name="name" placeholder="Party name" required><button type="submit">Add Party</button></form>
-</section>
-<section class="card"><h2>Politicians / Positions</h2><div class="table-wrap"><table><thead><tr><th>Username</th><th>Position</th><th>Party</th><th>Action</th></tr></thead><tbody>
-<?php foreach ($politicians as $p): ?><tr><td><?= esc((string)$p['username']) ?></td><td><?= esc((string)($p['position'] ?? '')) ?></td><td><?= esc((string)($p['party_id'] ?? '')) ?></td><td><form method="POST" class="inline-form"><input type="hidden" name="action" value="update_politician"><input type="hidden" name="politician_id" value="<?= (int)$p['id'] ?>"><input type="text" name="position" value="<?= esc((string)($p['position'] ?? '')) ?>" placeholder="Position"><select name="party_id"><option value="">No party</option><?php foreach ($parties as $party): ?><option value="<?= (int)$party['id'] ?>" <?= (int)$party['id'] === (int)$p['party_id'] ? 'selected' : '' ?>><?= esc((string)$party['name']) ?></option><?php endforeach; ?></select><!-- Action: Save party/position changes for this politician. --><button type="submit">Save</button></form></td></tr><?php endforeach; ?>
->>>>>>> e7daf47 (added comments)
 </tbody></table></div></section></main>
 <script src="../assets/js/header.js"></script>
 </body></html>

@@ -3,6 +3,24 @@ session_start();
 
 require_once __DIR__ . '/../includes/db.php';
 
+function record_login_audit(PDO $pdo, ?int $userId, string $email, string $status): void
+{
+    try {
+        $ip = $_SERVER['REMOTE_ADDR'] ?? null;
+        $stmt = $pdo->prepare(
+            'INSERT INTO login_audit (user_id, email, login_status, ip_address)
+             VALUES (:user_id, :email, :login_status, :ip_address)'
+        );
+        $stmt->bindValue(':user_id', $userId, $userId === null ? PDO::PARAM_NULL : PDO::PARAM_INT);
+        $stmt->bindValue(':email', $email !== '' ? $email : null, $email !== '' ? PDO::PARAM_STR : PDO::PARAM_NULL);
+        $stmt->bindValue(':login_status', $status);
+        $stmt->bindValue(':ip_address', $ip);
+        $stmt->execute();
+    } catch (PDOException $e) {
+        // Ignore audit failures to avoid breaking authentication.
+    }
+}
+
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
     header('Location: ../index.php', true, 302);
@@ -26,6 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $stmt->fetch();
 
             if ($user && password_verify($password, $user['password_hash'])) {
+                record_login_audit($pdo, (int) $user['id'], (string) $user['email'], 'success');
                 // Action: Regenerate the session and store user identity after successful login.
                 session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
@@ -37,9 +56,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ../index.php', true, 302);
                 exit;
             } else {
+                record_login_audit($pdo, null, $email, 'failed');
                 $error = 'Λανθασμένα στοιχεία σύνδεσης.';
             }
         } catch (PDOException $e) {
+            record_login_audit($pdo, null, $email, 'failed');
             $error = 'Λανθασμένα στοιχεία σύνδεσης.';
         }
     }
