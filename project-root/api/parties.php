@@ -2,7 +2,6 @@
 require_once __DIR__ . '/_bootstrap.php';
 
 api_apply_common_headers(['GET', 'POST', 'PUT', 'DELETE']);
-api_require_auth();
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 
@@ -25,7 +24,6 @@ if ($method === 'GET') {
 }
 
 if ($method === 'POST') {
-    api_require_role('admin');
     $payload = api_request_data();
     $name = trim((string) ($payload['name'] ?? ''));
     if ($name === '') {
@@ -38,7 +36,6 @@ if ($method === 'POST') {
 }
 
 if ($method === 'PUT') {
-    api_require_role('admin');
     $payload = api_request_data();
     $id = isset($payload['id']) ? (int) $payload['id'] : 0;
     $name = trim((string) ($payload['name'] ?? ''));
@@ -55,7 +52,6 @@ if ($method === 'PUT') {
 }
 
 if ($method === 'DELETE') {
-    api_require_role('admin');
     $payload = api_request_data();
     $id = isset($payload['id']) ? (int) $payload['id'] : 0;
     if ($id <= 0) {

@@ -2,14 +2,13 @@
 require_once __DIR__ . '/_bootstrap.php';
 
 api_apply_common_headers(['GET']);
-api_require_auth();
 
 $baseUrl = api_base_url('/api/index.php');
 
 api_send_json([
 	'name' => 'Pothen Esxes API',
 	'version' => '2.0',
-	'description' => 'REST endpoints for declarations, parties, reviews, and session state.',
+	'description' => 'Public REST endpoints for declarations, parties, reviews, statistics, and session state.',
 	'endpoints' => [
 		[
 			'path' => '/api/declarations.php',
@@ -21,19 +20,19 @@ api_send_json([
 			'path' => '/api/parties.php',
 			'methods' => ['GET', 'POST', 'PUT', 'DELETE'],
 			'url' => $baseUrl . '/parties.php',
-			'description' => 'Full CRUD for parties (admin required for write actions).',
+			'description' => 'Full CRUD for parties.',
 		],
 		[
 			'path' => '/api/reviews.php',
 			'methods' => ['GET', 'POST'],
 			'url' => $baseUrl . '/reviews.php',
-			'description' => 'List or create declaration reviews (admin for create).',
+			'description' => 'List or create declaration reviews.',
 		],
 		[
 			'path' => '/api/stats.php',
 			'methods' => ['GET'],
 			'url' => $baseUrl . '/stats.php',
-			'description' => 'Administrative statistics endpoint (admin session required).',
+			'description' => 'Statistics endpoint.',
 		],
 		[
 			'path' => '/api/auth_status.php',

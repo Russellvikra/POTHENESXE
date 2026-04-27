@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "POTHENESXE API Demo",
-    "description": "Demo collection for the required API checklist. Uses session authentication from your logged-in browser/PHP session.",
+    "description": "Publicly downloadable demo collection for the required API checklist. Some requests still require a logged-in session when executed.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [

@@ -2,8 +2,6 @@
 require_once __DIR__ . '/_bootstrap.php';
 
 api_apply_common_headers(['GET']);
-api_require_auth();
-api_require_role('admin');
 
 // Action: Query high-level declaration and asset totals.
 $summaryStmt = $pdo->prepare('SELECT COUNT(*) AS declarations, COALESCE(SUM(value),0) AS total_assets FROM declarations d LEFT JOIN assets a ON a.declaration_id = d.id');

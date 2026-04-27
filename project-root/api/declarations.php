@@ -2,11 +2,37 @@
 require_once __DIR__ . '/_bootstrap.php';
 
 api_apply_common_headers(['GET', 'POST', 'PUT', 'DELETE']);
-api_require_auth();
 
 $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-$currentUserId = (int) ($_SESSION['user_id'] ?? 0);
-$currentRole = (string) ($_SESSION['role'] ?? '');
+
+function user_exists(PDO $pdo, int $userId): bool
+{
+    if ($userId <= 0) {
+        return false;
+    }
+    $stmt = $pdo->prepare('SELECT id FROM users WHERE id = :id LIMIT 1');
+    $stmt->execute(['id' => $userId]);
+    return (bool) $stmt->fetchColumn();
+}
+
+function get_first_user_id(PDO $pdo): int
+{
+    $stmt = $pdo->prepare('SELECT id FROM users ORDER BY id ASC LIMIT 1');
+    $stmt->execute();
+    $id = $stmt->fetchColumn();
+    if ($id === false) {
+        api_send_json(['error' => 'No users available to assign declaration ownership'], 500);
+    }
+    return (int) $id;
+}
+
+function resolve_owner_user_id(PDO $pdo, int $requestedUserId): int
+{
+    if (user_exists($pdo, $requestedUserId)) {
+        return $requestedUserId;
+    }
+    return get_first_user_id($pdo);
+}
 
 function get_or_create_politician_id(PDO $pdo, int $userId): int
 {
@@ -51,15 +77,6 @@ function find_declaration(PDO $pdo, int $id): ?array
     $assetsStmt->execute(['id' => $id]);
     $row['assets'] = $assetsStmt->fetchAll();
     return $row;
-}
-
-function can_mutate_declaration(array $declaration, int $currentUserId, string $currentRole): bool
-{
-    if ($currentRole === 'admin') {
-        return true;
-    }
-
-    return (int) ($declaration['user_id'] ?? 0) === $currentUserId;
 }
 
 if ($method === 'GET') {
@@ -126,10 +143,8 @@ if ($method === 'POST') {
         api_send_json(['error' => 'Invalid status. Use draft|submitted'], 422);
     }
 
-    $userId = $currentUserId;
-    if ($currentRole === 'admin' && isset($payload['user_id'])) {
-        $userId = max(1, (int) $payload['user_id']);
-    }
+    $requestedUserId = isset($payload['user_id']) ? (int) $payload['user_id'] : 0;
+    $userId = resolve_owner_user_id($pdo, $requestedUserId);
 
     try {
         $pdo->beginTransaction();
@@ -194,10 +209,6 @@ if ($method === 'PUT') {
     if (!$declaration) {
         api_send_json(['error' => 'Declaration not found'], 404);
     }
-    if (!can_mutate_declaration($declaration, $currentUserId, $currentRole)) {
-        api_send_json(['error' => 'Forbidden'], 403);
-    }
-
     $year = isset($payload['year']) ? (int) $payload['year'] : (int) $declaration['year'];
     $status = isset($payload['status']) ? (string) $payload['status'] : (string) $declaration['status'];
     $title = array_key_exists('title', $payload) ? trim((string) $payload['title']) : (string) ($declaration['title'] ?? '');
@@ -274,10 +285,6 @@ if ($method === 'DELETE') {
     if (!$declaration) {
         api_send_json(['error' => 'Declaration not found'], 404);
     }
-    if (!can_mutate_declaration($declaration, $currentUserId, $currentRole)) {
-        api_send_json(['error' => 'Forbidden'], 403);
-    }
-
     $deleteStmt = $pdo->prepare('DELETE FROM declarations WHERE id = :id');
     $deleteStmt->execute(['id' => $id]);
     api_send_json(['message' => 'Declaration deleted', 'id' => $id]);

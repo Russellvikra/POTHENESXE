@@ -1,7 +1,22 @@
 <?php
-session_start();
+require_once __DIR__ . '/../includes/session.php';
+app_session_start();
 
 require_once __DIR__ . '/../includes/db.php';
+
+function redirect_to_role_home(string $role): void
+{
+    if ($role === 'admin') {
+        header('Location: ../admin/admin.php', true, 302);
+        exit;
+    }
+    if ($role === 'politician') {
+        header('Location: ../submit/dashboard.php', true, 302);
+        exit;
+    }
+    header('Location: ../modules/list.php', true, 302);
+    exit;
+}
 
 function record_login_audit(PDO $pdo, ?int $userId, string $email, string $status): void
 {
@@ -23,8 +38,7 @@ function record_login_audit(PDO $pdo, ?int $userId, string $email, string $statu
 
 // Redirect if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: ../index.php', true, 302);
-    exit;
+    redirect_to_role_home((string) ($_SESSION['role'] ?? 'user'));
 }
 
 $error = '';
@@ -52,9 +66,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['email'] = $user['email'];
                 $_SESSION['role'] = $user['role'];
 
-                // Action: Redirect authenticated user to the home page.
-                header('Location: ../index.php', true, 302);
-                exit;
+                // Action: Redirect authenticated user to their role-specific page.
+                redirect_to_role_home((string) $user['role']);
             } else {
                 record_login_audit($pdo, null, $email, 'failed');
                 $error = 'Λανθασμένα στοιχεία σύνδεσης.';
@@ -106,6 +119,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <p>Don't have an account? <a href="register.php">Register here</a></p>
+        <p>Open the public page: <a href="../index.php">Public Home</a></p>
     </div>
 </body>
 </html>
